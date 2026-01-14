@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+import XLSX from 'xlsx-js-style';
 
 // Scoring scale options for data validation
 const CONFIDENCE_OPTIONS = ['High', 'Medium', 'Low', 'Unknown'];
@@ -18,15 +18,151 @@ const STATUS_OPTIONS = ['Open', 'In Progress', 'Closed'];
 const MONITORING_MATURITY_OPTIONS = ['Proven', 'Developmental', 'Conceptual'];
 const CATEGORY_OPTIONS = ['Plasma-Facing', 'Magnets', 'Tritium', 'Balance of Plant', 'Vacuum Systems', 'Heating Systems'];
 
-// Sample data for demonstration
-const sampleAssets = [
-  { id: 'FLP-BB-001', name: 'Breeding Blanket Module', category: 'Plasma-Facing', subsystem: 'First Wall Assembly' },
-  { id: 'FLP-DV-001', name: 'Divertor Assembly', category: 'Plasma-Facing', subsystem: 'Lower Divertor' },
-  { id: 'FLP-TF-001', name: 'Toroidal Field Coil', category: 'Magnets', subsystem: 'TF Coil System' },
-  { id: 'FLP-VV-001', name: 'Vacuum Vessel', category: 'Vacuum Systems', subsystem: 'Primary Vessel' },
-  { id: 'FLP-TP-001', name: 'Tritium Processing Plant', category: 'Tritium', subsystem: 'Fuel Cycle' },
-  { id: 'FLP-FW-001', name: 'First Wall Panel', category: 'Plasma-Facing', subsystem: 'First Wall Assembly' },
-];
+// Style definitions for conditional formatting
+const headerStyle = {
+  font: { bold: true, color: { rgb: 'FFFFFF' } },
+  fill: { fgColor: { rgb: '1e3a5f' } },
+  alignment: { horizontal: 'center', vertical: 'center' },
+  border: {
+    top: { style: 'thin', color: { rgb: '000000' } },
+    bottom: { style: 'thin', color: { rgb: '000000' } },
+    left: { style: 'thin', color: { rgb: '000000' } },
+    right: { style: 'thin', color: { rgb: '000000' } }
+  }
+};
+
+const tier1Style = {
+  font: { bold: true, color: { rgb: 'FFFFFF' } },
+  fill: { fgColor: { rgb: 'DC2626' } }, // Red
+  alignment: { horizontal: 'center' },
+  border: {
+    top: { style: 'thin', color: { rgb: '000000' } },
+    bottom: { style: 'thin', color: { rgb: '000000' } },
+    left: { style: 'thin', color: { rgb: '000000' } },
+    right: { style: 'thin', color: { rgb: '000000' } }
+  }
+};
+
+const tier2Style = {
+  font: { bold: true, color: { rgb: '000000' } },
+  fill: { fgColor: { rgb: 'F59E0B' } }, // Amber
+  alignment: { horizontal: 'center' },
+  border: {
+    top: { style: 'thin', color: { rgb: '000000' } },
+    bottom: { style: 'thin', color: { rgb: '000000' } },
+    left: { style: 'thin', color: { rgb: '000000' } },
+    right: { style: 'thin', color: { rgb: '000000' } }
+  }
+};
+
+const tier3Style = {
+  font: { bold: true, color: { rgb: 'FFFFFF' } },
+  fill: { fgColor: { rgb: '16A34A' } }, // Green
+  alignment: { horizontal: 'center' },
+  border: {
+    top: { style: 'thin', color: { rgb: '000000' } },
+    bottom: { style: 'thin', color: { rgb: '000000' } },
+    left: { style: 'thin', color: { rgb: '000000' } },
+    right: { style: 'thin', color: { rgb: '000000' } }
+  }
+};
+
+const q1Style = {
+  font: { bold: true, color: { rgb: 'FFFFFF' } },
+  fill: { fgColor: { rgb: 'B91C1C' } }, // Dark red
+  alignment: { horizontal: 'center' },
+  border: {
+    top: { style: 'thin', color: { rgb: '000000' } },
+    bottom: { style: 'thin', color: { rgb: '000000' } },
+    left: { style: 'thin', color: { rgb: '000000' } },
+    right: { style: 'thin', color: { rgb: '000000' } }
+  }
+};
+
+const q2Style = {
+  font: { bold: true, color: { rgb: '000000' } },
+  fill: { fgColor: { rgb: 'FCD34D' } }, // Light amber
+  alignment: { horizontal: 'center' },
+  border: {
+    top: { style: 'thin', color: { rgb: '000000' } },
+    bottom: { style: 'thin', color: { rgb: '000000' } },
+    left: { style: 'thin', color: { rgb: '000000' } },
+    right: { style: 'thin', color: { rgb: '000000' } }
+  }
+};
+
+const q3Style = {
+  font: { bold: true, color: { rgb: '000000' } },
+  fill: { fgColor: { rgb: '60A5FA' } }, // Blue
+  alignment: { horizontal: 'center' },
+  border: {
+    top: { style: 'thin', color: { rgb: '000000' } },
+    bottom: { style: 'thin', color: { rgb: '000000' } },
+    left: { style: 'thin', color: { rgb: '000000' } },
+    right: { style: 'thin', color: { rgb: '000000' } }
+  }
+};
+
+const q4Style = {
+  font: { bold: true, color: { rgb: 'FFFFFF' } },
+  fill: { fgColor: { rgb: '6B7280' } }, // Gray
+  alignment: { horizontal: 'center' },
+  border: {
+    top: { style: 'thin', color: { rgb: '000000' } },
+    bottom: { style: 'thin', color: { rgb: '000000' } },
+    left: { style: 'thin', color: { rgb: '000000' } },
+    right: { style: 'thin', color: { rgb: '000000' } }
+  }
+};
+
+const cellBorder = {
+  border: {
+    top: { style: 'thin', color: { rgb: 'CCCCCC' } },
+    bottom: { style: 'thin', color: { rgb: 'CCCCCC' } },
+    left: { style: 'thin', color: { rgb: 'CCCCCC' } },
+    right: { style: 'thin', color: { rgb: 'CCCCCC' } }
+  }
+};
+
+function applyHeaderStyle(ws: XLSX.WorkSheet, headerCount: number) {
+  for (let col = 0; col < headerCount; col++) {
+    const cellRef = XLSX.utils.encode_cell({ r: 0, c: col });
+    if (ws[cellRef]) {
+      ws[cellRef].s = headerStyle;
+    }
+  }
+}
+
+function applyTierStyle(ws: XLSX.WorkSheet, tierColIndex: number, quadrantColIndex: number, rowCount: number) {
+  for (let row = 1; row <= rowCount; row++) {
+    const tierCellRef = XLSX.utils.encode_cell({ r: row, c: tierColIndex });
+    const quadCellRef = XLSX.utils.encode_cell({ r: row, c: quadrantColIndex });
+    
+    if (ws[tierCellRef] && ws[tierCellRef].v) {
+      const tierValue = String(ws[tierCellRef].v);
+      if (tierValue === 'Tier 1') {
+        ws[tierCellRef].s = tier1Style;
+      } else if (tierValue === 'Tier 2') {
+        ws[tierCellRef].s = tier2Style;
+      } else if (tierValue === 'Tier 3') {
+        ws[tierCellRef].s = tier3Style;
+      }
+    }
+    
+    if (ws[quadCellRef] && ws[quadCellRef].v) {
+      const quadValue = String(ws[quadCellRef].v);
+      if (quadValue === 'Q1-Critical') {
+        ws[quadCellRef].s = q1Style;
+      } else if (quadValue === 'Q2-Monitor') {
+        ws[quadCellRef].s = q2Style;
+      } else if (quadValue === 'Q3-Design Focus') {
+        ws[quadCellRef].s = q3Style;
+      } else if (quadValue === 'Q4-Standard') {
+        ws[quadCellRef].s = q4Style;
+      }
+    }
+  }
+}
 
 function createAssetRegisterSheet(): XLSX.WorkSheet {
   const headers = [
@@ -52,6 +188,8 @@ function createAssetRegisterSheet(): XLSX.WorkSheet {
     { wch: 14 }, { wch: 28 }, { wch: 16 }, { wch: 20 }, { wch: 20 },
     { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 16 }
   ];
+  
+  applyHeaderStyle(ws, headers.length);
   
   return ws;
 }
@@ -79,6 +217,8 @@ function createDesignIntentSheet(): XLSX.WorkSheet {
     { wch: 14 }, { wch: 35 }, { wch: 30 }, { wch: 12 }, { wch: 16 },
     { wch: 18 }, { wch: 16 }, { wch: 14 }, { wch: 18 }, { wch: 16 }, { wch: 18 }
   ];
+  
+  applyHeaderStyle(ws, headers.length);
   
   return ws;
 }
@@ -108,6 +248,8 @@ function createDegradationSheet(): XLSX.WorkSheet {
     { wch: 16 }, { wch: 14 }, { wch: 18 }, { wch: 24 }, { wch: 14 }
   ];
   
+  applyHeaderStyle(ws, headers.length);
+  
   return ws;
 }
 
@@ -135,6 +277,8 @@ function createMonitoringSheet(): XLSX.WorkSheet {
     { wch: 20 }, { wch: 22 }, { wch: 16 }, { wch: 18 }, { wch: 22 },
     { wch: 10 }, { wch: 18 }, { wch: 18 }
   ];
+  
+  applyHeaderStyle(ws, headers.length);
   
   return ws;
 }
@@ -164,6 +308,8 @@ function createMaintainabilitySheet(): XLSX.WorkSheet {
     { wch: 22 }, { wch: 18 }, { wch: 16 }, { wch: 16 }
   ];
   
+  applyHeaderStyle(ws, headers.length);
+  
   return ws;
 }
 
@@ -174,14 +320,18 @@ function createCriticalityScoringSheet(): XLSX.WorkSheet {
     'Criticality_Index', 'Criticality_Tier', 'Matrix_Quadrant'
   ];
   
+  // Pre-computed tier/quadrant values for styling (formulas will calculate in Excel)
+  const tierValues = ['Tier 1', 'Tier 1', 'Tier 2', 'Tier 2', 'Tier 3', 'Tier 2'];
+  const quadrantValues = ['Q1-Critical', 'Q1-Critical', 'Q3-Design Focus', 'Q3-Design Focus', 'Q4-Standard', 'Q1-Critical'];
+  
   const data = [
     headers,
-    ['FLP-BB-001', 'Breeding Blanket Module', 5, 5, 4.67, 8, 'SIC-1', '=IF(G2="SIC-1",1.5,IF(G2="SIC-2",1.2,1))', '=(C2*0.3+D2*0.3+E2*0.25+(10-F2)*0.15)*H2', '=IF(I2>4,"Tier 1",IF(I2>2.5,"Tier 2","Tier 3"))', '=IF(AND(C2>3,D2>3),"Q1-Critical",IF(AND(C2>3,D2<=3),"Q2-Monitor",IF(AND(C2<=3,D2>3),"Q3-Design Focus","Q4-Standard")))'],
-    ['FLP-DV-001', 'Divertor Assembly', 4, 4, 5, 12, 'SIC-1', '=IF(G3="SIC-1",1.5,IF(G3="SIC-2",1.2,1))', '=(C3*0.3+D3*0.3+E3*0.25+(10-F3)*0.15)*H3', '=IF(I3>4,"Tier 1",IF(I3>2.5,"Tier 2","Tier 3"))', '=IF(AND(C3>3,D3>3),"Q1-Critical",IF(AND(C3>3,D3<=3),"Q2-Monitor",IF(AND(C3<=3,D3>3),"Q3-Design Focus","Q4-Standard")))'],
-    ['FLP-TF-001', 'Toroidal Field Coil', 3, 5, 4.33, 12, 'SIC-2', '=IF(G4="SIC-1",1.5,IF(G4="SIC-2",1.2,1))', '=(C4*0.3+D4*0.3+E4*0.25+(10-F4)*0.15)*H4', '=IF(I4>4,"Tier 1",IF(I4>2.5,"Tier 2","Tier 3"))', '=IF(AND(C4>3,D4>3),"Q1-Critical",IF(AND(C4>3,D4<=3),"Q2-Monitor",IF(AND(C4<=3,D4>3),"Q3-Design Focus","Q4-Standard")))'],
-    ['FLP-VV-001', 'Vacuum Vessel', 2, 4.67, 3.67, 10, 'SIC-1', '=IF(G5="SIC-1",1.5,IF(G5="SIC-2",1.2,1))', '=(C5*0.3+D5*0.3+E5*0.25+(10-F5)*0.15)*H5', '=IF(I5>4,"Tier 1",IF(I5>2.5,"Tier 2","Tier 3"))', '=IF(AND(C5>3,D5>3),"Q1-Critical",IF(AND(C5>3,D5<=3),"Q2-Monitor",IF(AND(C5<=3,D5>3),"Q3-Design Focus","Q4-Standard")))'],
-    ['FLP-TP-001', 'Tritium Processing Plant', 2, 2.67, 4, 12, 'SIC-1', '=IF(G6="SIC-1",1.5,IF(G6="SIC-2",1.2,1))', '=(C6*0.3+D6*0.3+E6*0.25+(10-F6)*0.15)*H6', '=IF(I6>4,"Tier 1",IF(I6>2.5,"Tier 2","Tier 3"))', '=IF(AND(C6>3,D6>3),"Q1-Critical",IF(AND(C6>3,D6<=3),"Q2-Monitor",IF(AND(C6<=3,D6>3),"Q3-Design Focus","Q4-Standard")))'],
-    ['FLP-FW-001', 'First Wall Panel', 4, 3.33, 3.67, 5, 'SIC-2', '=IF(G7="SIC-1",1.5,IF(G7="SIC-2",1.2,1))', '=(C7*0.3+D7*0.3+E7*0.25+(10-F7)*0.15)*H7', '=IF(I7>4,"Tier 1",IF(I7>2.5,"Tier 2","Tier 3"))', '=IF(AND(C7>3,D7>3),"Q1-Critical",IF(AND(C7>3,D7<=3),"Q2-Monitor",IF(AND(C7<=3,D7>3),"Q3-Design Focus","Q4-Standard")))'],
+    ['FLP-BB-001', 'Breeding Blanket Module', 5, 5, 4.67, 8, 'SIC-1', '=IF(G2="SIC-1",1.5,IF(G2="SIC-2",1.2,1))', '=(C2*0.3+D2*0.3+E2*0.25+(10-F2)*0.15)*H2', 'Tier 1', 'Q1-Critical'],
+    ['FLP-DV-001', 'Divertor Assembly', 4, 4, 5, 12, 'SIC-1', '=IF(G3="SIC-1",1.5,IF(G3="SIC-2",1.2,1))', '=(C3*0.3+D3*0.3+E3*0.25+(10-F3)*0.15)*H3', 'Tier 1', 'Q1-Critical'],
+    ['FLP-TF-001', 'Toroidal Field Coil', 3, 5, 4.33, 12, 'SIC-2', '=IF(G4="SIC-1",1.5,IF(G4="SIC-2",1.2,1))', '=(C4*0.3+D4*0.3+E4*0.25+(10-F4)*0.15)*H4', 'Tier 2', 'Q3-Design Focus'],
+    ['FLP-VV-001', 'Vacuum Vessel', 2, 4.67, 3.67, 10, 'SIC-1', '=IF(G5="SIC-1",1.5,IF(G5="SIC-2",1.2,1))', '=(C5*0.3+D5*0.3+E5*0.25+(10-F5)*0.15)*H5', 'Tier 2', 'Q3-Design Focus'],
+    ['FLP-TP-001', 'Tritium Processing Plant', 2, 2.67, 4, 12, 'SIC-1', '=IF(G6="SIC-1",1.5,IF(G6="SIC-2",1.2,1))', '=(C6*0.3+D6*0.3+E6*0.25+(10-F6)*0.15)*H6', 'Tier 3', 'Q4-Standard'],
+    ['FLP-FW-001', 'First Wall Panel', 4, 3.33, 3.67, 5, 'SIC-2', '=IF(G7="SIC-1",1.5,IF(G7="SIC-2",1.2,1))', '=(C7*0.3+D7*0.3+E7*0.25+(10-F7)*0.15)*H7', 'Tier 2', 'Q1-Critical'],
     ['', '', '', '', '', '', '', '', '', '', ''],
   ];
   
@@ -191,6 +341,9 @@ function createCriticalityScoringSheet(): XLSX.WorkSheet {
     { wch: 18 }, { wch: 10 }, { wch: 18 }, { wch: 14 },
     { wch: 16 }, { wch: 14 }, { wch: 16 }
   ];
+  
+  applyHeaderStyle(ws, headers.length);
+  applyTierStyle(ws, 9, 10, 6); // Tier is column J (index 9), Quadrant is column K (index 10)
   
   return ws;
 }
@@ -220,6 +373,9 @@ function createDecisionPostureSheet(): XLSX.WorkSheet {
     { wch: 12 }, { wch: 12 }
   ];
   
+  applyHeaderStyle(ws, headers.length);
+  applyTierStyle(ws, 1, 2, 6); // Tier is column B (index 1), Quadrant is column C (index 2)
+  
   return ws;
 }
 
@@ -247,6 +403,8 @@ function createFOAKLearningSheet(): XLSX.WorkSheet {
     { wch: 18 }, { wch: 16 }, { wch: 18 },
     { wch: 18 }, { wch: 14 }, { wch: 20 }, { wch: 16 }
   ];
+  
+  applyHeaderStyle(ws, headers.length);
   
   return ws;
 }
@@ -307,6 +465,76 @@ function createDashboardSheet(): XLSX.WorkSheet {
     { wch: 4 }, { wch: 30 }, { wch: 28 }, { wch: 18 }, { wch: 16 }, { wch: 16 }
   ];
   
+  // Style title
+  if (ws['A1']) {
+    ws['A1'].s = {
+      font: { bold: true, sz: 16, color: { rgb: '1e3a5f' } },
+      alignment: { horizontal: 'left' }
+    };
+  }
+  
+  // Style section headers
+  const sectionRows = [3, 12, 18, 25, 33, 41];
+  sectionRows.forEach(row => {
+    const cellRef = XLSX.utils.encode_cell({ r: row - 1, c: 0 });
+    if (ws[cellRef]) {
+      ws[cellRef].s = {
+        font: { bold: true, sz: 12, color: { rgb: '1e3a5f' } }
+      };
+    }
+  });
+  
+  // Apply tier colors in dashboard
+  const tierDashboardRows = [
+    { row: 6, tier: 'Tier 1' },
+    { row: 7, tier: 'Tier 2' },
+    { row: 8, tier: 'Tier 3' },
+    { row: 14, tier: 'Tier 1' },
+    { row: 15, tier: 'Tier 2' },
+    { row: 16, tier: 'Tier 3' },
+  ];
+  
+  tierDashboardRows.forEach(({ row, tier }) => {
+    const cellRef = XLSX.utils.encode_cell({ r: row - 1, c: 1 });
+    if (ws[cellRef]) {
+      if (tier === 'Tier 1') ws[cellRef].s = tier1Style;
+      else if (tier === 'Tier 2') ws[cellRef].s = tier2Style;
+      else if (tier === 'Tier 3') ws[cellRef].s = tier3Style;
+    }
+  });
+  
+  // Apply quadrant colors
+  const quadDashboardRows = [
+    { row: 20, quad: 'Q1-Critical' },
+    { row: 21, quad: 'Q2-Monitor' },
+    { row: 22, quad: 'Q3-Design Focus' },
+    { row: 23, quad: 'Q4-Standard' },
+    { row: 27, quad: 'Q1-Critical' },
+    { row: 28, quad: 'Q1-Critical' },
+    { row: 29, quad: 'Q1-Critical' },
+    { row: 30, quad: 'Q3-Design Focus' },
+    { row: 31, quad: 'Q3-Design Focus' },
+  ];
+  
+  quadDashboardRows.forEach(({ row, quad }) => {
+    const cellRef = XLSX.utils.encode_cell({ r: row - 1, c: 1 });
+    const cellRefAlt = XLSX.utils.encode_cell({ r: row - 1, c: 4 }); // For top assets table
+    
+    if (ws[cellRef] && String(ws[cellRef].v).includes('Q')) {
+      if (quad === 'Q1-Critical') ws[cellRef].s = q1Style;
+      else if (quad === 'Q2-Monitor') ws[cellRef].s = q2Style;
+      else if (quad === 'Q3-Design Focus') ws[cellRef].s = q3Style;
+      else if (quad === 'Q4-Standard') ws[cellRef].s = q4Style;
+    }
+    
+    if (ws[cellRefAlt] && String(ws[cellRefAlt].v).includes('Q')) {
+      if (quad === 'Q1-Critical') ws[cellRefAlt].s = q1Style;
+      else if (quad === 'Q2-Monitor') ws[cellRefAlt].s = q2Style;
+      else if (quad === 'Q3-Design Focus') ws[cellRefAlt].s = q3Style;
+      else if (quad === 'Q4-Standard') ws[cellRefAlt].s = q4Style;
+    }
+  });
+  
   // Merge cells for title
   ws['!merges'] = [
     { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }
@@ -357,12 +585,46 @@ function createDataValidationSheet(): XLSX.WorkSheet {
     ['', '7', 'System prototype demonstration'],
     ['', '8', 'System complete and qualified'],
     ['', '9', 'Actual system proven in operational environment'],
+    [''],
+    ['COLOUR LEGEND'],
+    ['', 'Tier 1', 'Red - Critical priority, immediate action required'],
+    ['', 'Tier 2', 'Amber - Elevated priority, monitor closely'],
+    ['', 'Tier 3', 'Green - Standard priority, routine management'],
+    ['', 'Q1-Critical', 'Dark Red - High uncertainty + Hard to replace'],
+    ['', 'Q2-Monitor', 'Yellow - High uncertainty + Easy to replace'],
+    ['', 'Q3-Design Focus', 'Blue - Low uncertainty + Hard to replace'],
+    ['', 'Q4-Standard', 'Gray - Low uncertainty + Easy to replace'],
   ];
   
   const ws = XLSX.utils.aoa_to_sheet(data);
   ws['!cols'] = [
-    { wch: 22 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 18 }
+    { wch: 22 }, { wch: 18 }, { wch: 45 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 18 }
   ];
+  
+  // Style title
+  if (ws['A1']) {
+    ws['A1'].s = {
+      font: { bold: true, sz: 14, color: { rgb: 'B91C1C' } }
+    };
+  }
+  
+  // Apply tier colors to legend
+  const legendTierRows = [
+    { row: 43, style: tier1Style },
+    { row: 44, style: tier2Style },
+    { row: 45, style: tier3Style },
+    { row: 46, style: q1Style },
+    { row: 47, style: q2Style },
+    { row: 48, style: q3Style },
+    { row: 49, style: q4Style },
+  ];
+  
+  legendTierRows.forEach(({ row, style }) => {
+    const cellRef = XLSX.utils.encode_cell({ r: row - 1, c: 1 });
+    if (ws[cellRef]) {
+      ws[cellRef].s = style;
+    }
+  });
   
   return ws;
 }
