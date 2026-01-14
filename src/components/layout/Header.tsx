@@ -1,5 +1,6 @@
 import { Bell, Search, Settings, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ExportTemplateButton } from '@/components/export/ExportTemplateButton';
 
 interface HeaderProps {
   title: string;
@@ -17,6 +18,10 @@ export const Header = ({ title, subtitle }: HeaderProps) => {
       </div>
       
       <div className="flex items-center gap-2">
+        <ExportTemplateButton />
+        
+        <div className="w-px h-8 bg-border mx-2" />
+        
         <div className="relative">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input
