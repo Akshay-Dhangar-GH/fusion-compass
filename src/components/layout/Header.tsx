@@ -2,6 +2,7 @@ import { Bell, Search, Settings, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ExportTemplateButton } from '@/components/export/ExportTemplateButton';
 import { ExportMethodologyButton } from '@/components/export/ExportMethodologyButton';
+import { ScenarioPanel } from '@/components/scenario/ScenarioPanel';
 
 interface HeaderProps {
   title: string;
@@ -19,6 +20,10 @@ export const Header = ({ title, subtitle }: HeaderProps) => {
       </div>
       
       <div className="flex items-center gap-2">
+        <ScenarioPanel />
+        
+        <div className="w-px h-8 bg-border mx-2" />
+        
         <ExportTemplateButton />
         <ExportMethodologyButton />
         
