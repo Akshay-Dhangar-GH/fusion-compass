@@ -36,6 +36,15 @@ export interface EndOfLifeAssumptions {
   disposalComplexity: 'Low' | 'Medium' | 'High' | 'Very High';
 }
 
+// Cost & Schedule Parameters
+export interface CostScheduleParams {
+  replacementCostMillions: number; // In millions USD/GBP
+  leadTimeMonths: number; // Procurement and manufacturing lead time
+  downtimeWeeks: number; // Estimated downtime for replacement
+  annualMaintenanceCostMillions: number; // Annual maintenance cost
+  sparePartsAvailability: 'High' | 'Medium' | 'Low' | 'Critical';
+}
+
 export interface FusionAsset {
   id: string;
   name: string;
@@ -69,6 +78,9 @@ export interface FusionAsset {
   learningPriority: 'Immediate' | 'High' | 'Medium' | 'Low';
   rdInvestmentJustification: string;
   instrumentationPriority: number; // 1-5
+  
+  // Cost & Schedule
+  costSchedule: CostScheduleParams;
 }
 
 export const fusionAssets: FusionAsset[] = [
@@ -166,7 +178,14 @@ export const fusionAssets: FusionAsset[] = [
     },
     learningPriority: 'Immediate',
     rdInvestmentJustification: 'Critical path for fusion economics and fuel self-sufficiency',
-    instrumentationPriority: 5
+    instrumentationPriority: 5,
+    costSchedule: {
+      replacementCostMillions: 120,
+      leadTimeMonths: 36,
+      downtimeWeeks: 8,
+      annualMaintenanceCostMillions: 8,
+      sparePartsAvailability: 'Critical'
+    }
   },
   {
     id: 'divertor',
@@ -262,7 +281,14 @@ export const fusionAssets: FusionAsset[] = [
     },
     learningPriority: 'Immediate',
     rdInvestmentJustification: 'Most life-limiting component, directly sets maintenance schedule',
-    instrumentationPriority: 5
+    instrumentationPriority: 5,
+    costSchedule: {
+      replacementCostMillions: 85,
+      leadTimeMonths: 24,
+      downtimeWeeks: 4,
+      annualMaintenanceCostMillions: 12,
+      sparePartsAvailability: 'Low'
+    }
   },
   {
     id: 'first-wall',
@@ -345,7 +371,14 @@ export const fusionAssets: FusionAsset[] = [
     },
     learningPriority: 'High',
     rdInvestmentJustification: 'Large quantity component, manufacturing scale-up required',
-    instrumentationPriority: 4
+    instrumentationPriority: 4,
+    costSchedule: {
+      replacementCostMillions: 45,
+      leadTimeMonths: 18,
+      downtimeWeeks: 10,
+      annualMaintenanceCostMillions: 3,
+      sparePartsAvailability: 'Medium'
+    }
   },
   {
     id: 'tf-coils',
@@ -435,7 +468,14 @@ export const fusionAssets: FusionAsset[] = [
     },
     learningPriority: 'High',
     rdInvestmentJustification: 'Must be right first time - no opportunity for operational learning',
-    instrumentationPriority: 5
+    instrumentationPriority: 5,
+    costSchedule: {
+      replacementCostMillions: 500,
+      leadTimeMonths: 72,
+      downtimeWeeks: 104,
+      annualMaintenanceCostMillions: 5,
+      sparePartsAvailability: 'Critical'
+    }
   },
   {
     id: 'vacuum-vessel',
@@ -518,7 +558,14 @@ export const fusionAssets: FusionAsset[] = [
     },
     learningPriority: 'Medium',
     rdInvestmentJustification: 'Well-understood technology but scale and integration challenges',
-    instrumentationPriority: 3
+    instrumentationPriority: 3,
+    costSchedule: {
+      replacementCostMillions: 350,
+      leadTimeMonths: 60,
+      downtimeWeeks: 156,
+      annualMaintenanceCostMillions: 2,
+      sparePartsAvailability: 'High'
+    }
   },
   {
     id: 'tritium-plant',
@@ -601,7 +648,14 @@ export const fusionAssets: FusionAsset[] = [
     },
     learningPriority: 'High',
     rdInvestmentJustification: 'Scale-up from laboratory to industrial scale required',
-    instrumentationPriority: 4
+    instrumentationPriority: 4,
+    costSchedule: {
+      replacementCostMillions: 25,
+      leadTimeMonths: 12,
+      downtimeWeeks: 6,
+      annualMaintenanceCostMillions: 4,
+      sparePartsAvailability: 'Medium'
+    }
   }
 ];
 

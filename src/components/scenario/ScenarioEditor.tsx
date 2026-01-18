@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useScenario } from '@/contexts/ScenarioContext';
-import { FusionAsset } from '@/data/fusionAssets';
+import { FusionAsset, CostScheduleParams } from '@/data/fusionAssets';
 import { cn } from '@/lib/utils';
 import { 
   Slider,
@@ -25,8 +25,11 @@ import {
   Shield,
   Wrench,
   Activity,
+  DollarSign,
+  Clock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface ScenarioEditorProps {
   scenarioId: string;
@@ -322,6 +325,111 @@ const AssetParameterEditor = ({ asset, onModify, onReset }: AssetParameterEditor
             step={1}
             className="cursor-pointer"
           />
+        </div>
+      </div>
+
+      {/* Cost & Schedule */}
+      <div className="space-y-3 pt-3 border-t border-border">
+        <h5 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+          <DollarSign className="w-3 h-3" />
+          Cost & Schedule
+        </h5>
+        
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-muted-foreground">Replacement Cost (M$)</label>
+            <span className="text-xs font-mono bg-secondary px-2 py-0.5 rounded">
+              ${asset.costSchedule.replacementCostMillions}M
+            </span>
+          </div>
+          <Slider
+            value={[asset.costSchedule.replacementCostMillions]}
+            onValueChange={([value]) => onModify({ 
+              costSchedule: { ...asset.costSchedule, replacementCostMillions: value } 
+            })}
+            min={1}
+            max={600}
+            step={5}
+            className="cursor-pointer"
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-muted-foreground">Lead Time (months)</label>
+            <span className="text-xs font-mono bg-secondary px-2 py-0.5 rounded">
+              {asset.costSchedule.leadTimeMonths} mo
+            </span>
+          </div>
+          <Slider
+            value={[asset.costSchedule.leadTimeMonths]}
+            onValueChange={([value]) => onModify({ 
+              costSchedule: { ...asset.costSchedule, leadTimeMonths: value } 
+            })}
+            min={1}
+            max={84}
+            step={1}
+            className="cursor-pointer"
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-muted-foreground">Downtime Impact (weeks)</label>
+            <span className="text-xs font-mono bg-secondary px-2 py-0.5 rounded">
+              {asset.costSchedule.downtimeWeeks} wks
+            </span>
+          </div>
+          <Slider
+            value={[asset.costSchedule.downtimeWeeks]}
+            onValueChange={([value]) => onModify({ 
+              costSchedule: { ...asset.costSchedule, downtimeWeeks: value } 
+            })}
+            min={1}
+            max={200}
+            step={1}
+            className="cursor-pointer"
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-muted-foreground">Annual Maintenance (M$)</label>
+            <span className="text-xs font-mono bg-secondary px-2 py-0.5 rounded">
+              ${asset.costSchedule.annualMaintenanceCostMillions}M/yr
+            </span>
+          </div>
+          <Slider
+            value={[asset.costSchedule.annualMaintenanceCostMillions]}
+            onValueChange={([value]) => onModify({ 
+              costSchedule: { ...asset.costSchedule, annualMaintenanceCostMillions: value } 
+            })}
+            min={0}
+            max={20}
+            step={0.5}
+            className="cursor-pointer"
+          />
+        </div>
+        
+        <div className="space-y-1">
+          <label className="text-xs text-muted-foreground">Spare Parts Availability</label>
+          <Select
+            value={asset.costSchedule.sparePartsAvailability}
+            onValueChange={(value) => onModify({ 
+              costSchedule: { ...asset.costSchedule, sparePartsAvailability: value as CostScheduleParams['sparePartsAvailability'] } 
+            })}
+          >
+            <SelectTrigger className="h-8 text-xs bg-background">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-popover border border-border shadow-lg z-50">
+              {['High', 'Medium', 'Low', 'Critical'].map((level) => (
+                <SelectItem key={level} value={level} className="text-xs">
+                  {level}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
