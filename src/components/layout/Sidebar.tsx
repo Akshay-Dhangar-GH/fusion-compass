@@ -8,7 +8,8 @@ import {
   Atom,
   Shield,
   Wrench,
-  Briefcase
+  Briefcase,
+  Calculator
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -29,6 +30,7 @@ const navItems: NavItem[] = [
   { id: 'passports', label: 'Asset Passports', icon: <FileText className="w-5 h-5" />, badge: '6' },
   { id: 'matrix', label: 'Criticality Matrix', icon: <Grid3X3 className="w-5 h-5" /> },
   { id: 'analytics', label: 'Decision Analytics', icon: <LineChart className="w-5 h-5" /> },
+  { id: 'costbenefit', label: 'Cost-Benefit Analysis', icon: <Calculator className="w-5 h-5" /> },
   { id: 'consulting', label: 'Delivery Model', icon: <Briefcase className="w-5 h-5" /> },
 ];
 
