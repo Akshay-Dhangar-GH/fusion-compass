@@ -43,17 +43,30 @@ export const ScenarioComparison = () => {
       }[] = [];
 
       // Compare key metrics
-      const metrics: { field: keyof FusionAsset; label: string; higherIsBetter?: boolean }[] = [
+      const metrics: { field: keyof FusionAsset | string; label: string; higherIsBetter?: boolean; nested?: boolean }[] = [
         { field: 'neutronDamageUncertainty', label: 'Neutron Uncertainty' },
         { field: 'replaceabilityDifficulty', label: 'Replaceability' },
         { field: 'systemValueImpact', label: 'System Value Impact' },
         { field: 'confidenceScore', label: 'Confidence', higherIsBetter: true },
         { field: 'instrumentationPriority', label: 'Instrumentation Priority' },
+        { field: 'costSchedule.replacementCostMillions', label: 'Replacement Cost (M$)', nested: true },
+        { field: 'costSchedule.leadTimeMonths', label: 'Lead Time (mo)', nested: true },
+        { field: 'costSchedule.downtimeWeeks', label: 'Downtime (wks)', nested: true },
+        { field: 'costSchedule.annualMaintenanceCostMillions', label: 'Annual Maint. (M$)', nested: true },
       ];
 
-      metrics.forEach(({ field, label, higherIsBetter }) => {
-        const activeVal = activeAsset[field] as number;
-        const compVal = compAsset[field] as number;
+      metrics.forEach(({ field, label, higherIsBetter, nested }) => {
+        let activeVal: number;
+        let compVal: number;
+        
+        if (nested) {
+          const [parent, child] = field.split('.');
+          activeVal = (activeAsset as any)[parent]?.[child] as number;
+          compVal = (compAsset as any)[parent]?.[child] as number;
+        } else {
+          activeVal = activeAsset[field as keyof FusionAsset] as number;
+          compVal = compAsset[field as keyof FusionAsset] as number;
+        }
         
         if (activeVal !== compVal) {
           const direction = activeVal > compVal ? 'up' : activeVal < compVal ? 'down' : 'same';
@@ -74,6 +87,21 @@ export const ScenarioComparison = () => {
           });
         }
       });
+
+      // Compare spare parts availability
+      if (activeAsset.costSchedule?.sparePartsAvailability !== compAsset.costSchedule?.sparePartsAvailability) {
+        const spareOrder = ['High', 'Medium', 'Low', 'Critical'];
+        const activeIdx = spareOrder.indexOf(activeAsset.costSchedule?.sparePartsAvailability || 'Medium');
+        const compIdx = spareOrder.indexOf(compAsset.costSchedule?.sparePartsAvailability || 'Medium');
+        
+        changes.push({
+          field: 'Spare Parts Availability',
+          activeValue: activeAsset.costSchedule?.sparePartsAvailability,
+          compValue: compAsset.costSchedule?.sparePartsAvailability,
+          direction: activeIdx > compIdx ? 'up' : 'down',
+          impact: activeIdx > compIdx ? 'negative' : 'positive',
+        });
+      }
 
       // Compare categorical values
       if (activeAsset.riskLevel !== compAsset.riskLevel) {
@@ -123,8 +151,11 @@ export const ScenarioComparison = () => {
       const criticalCount = assets.filter(a => a.riskLevel === 'Critical').length;
       const avgCriticality = assets.reduce((s, a) => 
         s + a.neutronDamageUncertainty + a.replaceabilityDifficulty + a.systemValueImpact, 0) / assets.length;
+      const totalReplacementCost = assets.reduce((s, a) => s + (a.costSchedule?.replacementCostMillions || 0), 0);
+      const totalAnnualMaintenance = assets.reduce((s, a) => s + (a.costSchedule?.annualMaintenanceCostMillions || 0), 0);
+      const avgLeadTime = assets.reduce((s, a) => s + (a.costSchedule?.leadTimeMonths || 0), 0) / assets.length;
       
-      return { avgConfidence, criticalCount, avgCriticality };
+      return { avgConfidence, criticalCount, avgCriticality, totalReplacementCost, totalAnnualMaintenance, avgLeadTime };
     };
 
     const activeScore = calcScore(activeAssets);
@@ -182,6 +213,20 @@ export const ScenarioComparison = () => {
               <p className="text-xl font-bold">{comparison.summary.activeScore.avgCriticality.toFixed(1)}</p>
             </div>
           </div>
+          <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-border">
+            <div>
+              <p className="text-xs text-muted-foreground">Total Replace Cost</p>
+              <p className="text-lg font-bold">${comparison.summary.activeScore.totalReplacementCost}M</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Annual Maint.</p>
+              <p className="text-lg font-bold">${comparison.summary.activeScore.totalAnnualMaintenance}M/yr</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Avg Lead Time</p>
+              <p className="text-lg font-bold">{Math.round(comparison.summary.activeScore.avgLeadTime)} mo</p>
+            </div>
+          </div>
         </div>
         
         <div 
@@ -217,6 +262,34 @@ export const ScenarioComparison = () => {
               <p className="text-xl font-bold">{comparison.summary.compScore.avgCriticality.toFixed(1)}</p>
               <DeltaIndicator 
                 delta={comparison.summary.compScore.avgCriticality - comparison.summary.activeScore.avgCriticality}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-border">
+            <div>
+              <p className="text-xs text-muted-foreground">Total Replace Cost</p>
+              <p className="text-lg font-bold">${comparison.summary.compScore.totalReplacementCost}M</p>
+              <DeltaIndicator 
+                delta={comparison.summary.compScore.totalReplacementCost - comparison.summary.activeScore.totalReplacementCost}
+                prefix="$"
+                suffix="M"
+              />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Annual Maint.</p>
+              <p className="text-lg font-bold">${comparison.summary.compScore.totalAnnualMaintenance}M/yr</p>
+              <DeltaIndicator 
+                delta={comparison.summary.compScore.totalAnnualMaintenance - comparison.summary.activeScore.totalAnnualMaintenance}
+                prefix="$"
+                suffix="M"
+              />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Avg Lead Time</p>
+              <p className="text-lg font-bold">{Math.round(comparison.summary.compScore.avgLeadTime)} mo</p>
+              <DeltaIndicator 
+                delta={comparison.summary.compScore.avgLeadTime - comparison.summary.activeScore.avgLeadTime}
+                suffix=" mo"
               />
             </div>
           </div>
@@ -306,14 +379,19 @@ export const ScenarioComparison = () => {
 
 const DeltaIndicator = ({ 
   delta, 
-  higherIsBetter = false 
+  higherIsBetter = false,
+  prefix = '',
+  suffix = ''
 }: { 
   delta: number; 
   higherIsBetter?: boolean;
+  prefix?: string;
+  suffix?: string;
 }) => {
   if (Math.abs(delta) < 0.01) return null;
 
   const isPositive = higherIsBetter ? delta > 0 : delta < 0;
+  const formattedDelta = typeof delta === 'number' ? (Number.isInteger(delta) ? delta : delta.toFixed(1)) : delta;
   
   return (
     <div className={cn(
@@ -321,7 +399,7 @@ const DeltaIndicator = ({
       isPositive ? 'text-status-nominal' : 'text-status-critical'
     )}>
       {delta > 0 ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
-      <span>{delta > 0 ? '+' : ''}{typeof delta === 'number' ? (Number.isInteger(delta) ? delta : delta.toFixed(1)) : delta}</span>
+      <span>{delta > 0 ? '+' : ''}{prefix}{formattedDelta}{suffix}</span>
     </div>
   );
 };
