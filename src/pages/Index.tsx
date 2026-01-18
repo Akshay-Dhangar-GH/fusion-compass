@@ -6,10 +6,11 @@ import { PassportList } from '@/components/passport/PassportList';
 import { AssetPassport } from '@/components/passport/AssetPassport';
 import { CriticalityMatrix } from '@/components/matrix/CriticalityMatrix';
 import { DecisionAnalytics } from '@/components/analytics/DecisionAnalytics';
+import { CostBenefitAnalysis } from '@/components/analytics/CostBenefitAnalysis';
 import { DeliveryModel } from '@/components/consulting/DeliveryModel';
 import { getAssetById } from '@/data/fusionAssets';
 
-type Section = 'dashboard' | 'passports' | 'matrix' | 'analytics' | 'consulting';
+type Section = 'dashboard' | 'passports' | 'matrix' | 'analytics' | 'costbenefit' | 'consulting';
 
 const sectionHeaders: Record<Section, { title: string; subtitle: string }> = {
   dashboard: { 
@@ -27,6 +28,10 @@ const sectionHeaders: Record<Section, { title: string; subtitle: string }> = {
   analytics: { 
     title: 'Decision Analytics', 
     subtitle: 'Evidence-based decision support' 
+  },
+  costbenefit: { 
+    title: 'Cost-Benefit Analysis', 
+    subtitle: 'ROI calculation for maintenance strategies' 
   },
   consulting: { 
     title: 'Delivery Model', 
@@ -63,6 +68,8 @@ const Index = () => {
         return <CriticalityMatrix onSelectAsset={handleSelectAsset} />;
       case 'analytics':
         return <DecisionAnalytics />;
+      case 'costbenefit':
+        return <CostBenefitAnalysis />;
       case 'consulting':
         return <DeliveryModel />;
       default:
