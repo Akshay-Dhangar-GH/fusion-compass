@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { useScenario } from '@/contexts/ScenarioContext';
-import { FusionAsset } from '@/data/fusionAssets';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -22,8 +21,6 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  LineChart,
-  Line,
   PieChart,
   Pie,
   Cell,
@@ -43,63 +40,23 @@ import {
   Target,
   Zap,
 } from 'lucide-react';
-
-// Maintenance strategy definitions
-interface MaintenanceStrategy {
-  id: string;
-  name: string;
-  description: string;
-  costMultiplier: number;
-  downtimeReduction: number;
-  failureRiskReduction: number;
-  leadTimeImpact: number;
-}
-
-const maintenanceStrategies: MaintenanceStrategy[] = [
-  {
-    id: 'reactive',
-    name: 'Reactive (Run-to-Failure)',
-    description: 'Replace only when failure occurs. Lowest upfront cost, highest risk.',
-    costMultiplier: 0.3,
-    downtimeReduction: 0,
-    failureRiskReduction: 0,
-    leadTimeImpact: 1.5,
-  },
-  {
-    id: 'preventive',
-    name: 'Preventive (Time-Based)',
-    description: 'Scheduled replacement at fixed intervals regardless of condition.',
-    costMultiplier: 0.6,
-    downtimeReduction: 0.4,
-    failureRiskReduction: 0.5,
-    leadTimeImpact: 1.0,
-  },
-  {
-    id: 'predictive',
-    name: 'Predictive (Condition-Based)',
-    description: 'Replace based on monitored condition indicators and degradation trends.',
-    costMultiplier: 0.8,
-    downtimeReduction: 0.7,
-    failureRiskReduction: 0.75,
-    leadTimeImpact: 0.8,
-  },
-  {
-    id: 'proactive',
-    name: 'Proactive (RCM)',
-    description: 'Full reliability-centered maintenance with root cause elimination.',
-    costMultiplier: 1.0,
-    downtimeReduction: 0.85,
-    failureRiskReduction: 0.9,
-    leadTimeImpact: 0.6,
-  },
-];
-
-const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
+import { ScenarioHeader } from './ScenarioHeader';
+import { DeltaIndicator } from './DeltaIndicator';
+import { useStrategyAnalysis, maintenanceStrategies } from '@/hooks/useStrategyAnalysis';
 
 export const CostBenefitAnalysis = () => {
-  const { getActiveAssets } = useScenario();
-  const assets = getActiveAssets();
+  const { 
+    getActiveAssets, 
+    getComparisonAssets, 
+    getScenario, 
+    activeScenarioId, 
+    comparisonScenarioId 
+  } = useScenario();
   
+  const assets = getActiveAssets();
+  const comparisonAssets = getComparisonAssets();
+  
+  const [localCompareMode, setLocalCompareMode] = useState(false);
   const [selectedAssetId, setSelectedAssetId] = useState<string>(assets[0]?.id || '');
   const [planningHorizon, setPlanningHorizon] = useState(20); // years
   const [discountRate, setDiscountRate] = useState(5); // percent
@@ -107,126 +64,35 @@ export const CostBenefitAnalysis = () => {
   const [plantCapacity, setPlantCapacity] = useState(500); // MW
   
   const selectedAsset = assets.find(a => a.id === selectedAssetId);
+  const comparisonSelectedAsset = comparisonAssets?.find(a => a.id === selectedAssetId);
+  
+  const activeScenario = getScenario(activeScenarioId);
+  const comparisonScenario = comparisonScenarioId ? getScenario(comparisonScenarioId) : null;
+  
+  const effectiveCompareMode = localCompareMode && comparisonAssets && comparisonScenarioId;
 
-  // Calculate NPV and ROI for each strategy
-  const strategyAnalysis = useMemo(() => {
-    if (!selectedAsset) return [];
+  // Active scenario analysis
+  const { strategyWithROI, portfolioAnalysis } = useStrategyAnalysis({
+    assets,
+    selectedAsset,
+    planningHorizon,
+    discountRate,
+    electricityPrice,
+    plantCapacity,
+  });
 
-    const baseReplacementCost = selectedAsset.costSchedule.replacementCostMillions;
-    const baseAnnualMaintenance = selectedAsset.costSchedule.annualMaintenanceCostMillions;
-    const baseDowntime = selectedAsset.costSchedule.downtimeWeeks;
-    
-    // Revenue loss per week of downtime (simplified)
-    const weeklyRevenue = (plantCapacity * 168 * electricityPrice * 0.8) / 1000000; // M$/week
-    
-    return maintenanceStrategies.map(strategy => {
-      const annualMaintenanceCost = baseAnnualMaintenance * (1 + strategy.costMultiplier);
-      const expectedDowntime = baseDowntime * (1 - strategy.downtimeReduction);
-      const downtimeCostPerEvent = expectedDowntime * weeklyRevenue;
-      
-      // Calculate expected number of failures over planning horizon
-      const baseFailureRate = selectedAsset.riskLevel === 'Critical' ? 0.15 : 
-                              selectedAsset.riskLevel === 'High' ? 0.1 :
-                              selectedAsset.riskLevel === 'Medium' ? 0.05 : 0.02;
-      const adjustedFailureRate = baseFailureRate * (1 - strategy.failureRiskReduction);
-      const expectedFailures = adjustedFailureRate * planningHorizon;
-      
-      // NPV calculation
-      let npv = 0;
-      let totalMaintenanceCost = 0;
-      let totalDowntimeCost = 0;
-      let totalReplacementCost = 0;
-      
-      for (let year = 1; year <= planningHorizon; year++) {
-        const discountFactor = Math.pow(1 + discountRate / 100, -year);
-        
-        // Annual maintenance cost
-        const yearMaintenance = annualMaintenanceCost;
-        totalMaintenanceCost += yearMaintenance;
-        npv += yearMaintenance * discountFactor;
-        
-        // Expected failure cost in this year
-        const yearFailureProb = adjustedFailureRate;
-        const expectedFailureCost = yearFailureProb * (baseReplacementCost + downtimeCostPerEvent);
-        totalReplacementCost += yearFailureProb * baseReplacementCost;
-        totalDowntimeCost += yearFailureProb * downtimeCostPerEvent;
-        npv += expectedFailureCost * discountFactor;
-      }
-      
-      // Calculate ROI compared to reactive strategy
-      const reactiveNPV = maintenanceStrategies[0].id === strategy.id ? npv : null;
-      
-      return {
-        strategy,
-        npv,
-        annualMaintenanceCost,
-        expectedDowntime,
-        expectedFailures,
-        totalMaintenanceCost,
-        totalDowntimeCost,
-        totalReplacementCost,
-        totalCost: totalMaintenanceCost + totalDowntimeCost + totalReplacementCost,
-        availabilityGain: strategy.downtimeReduction * 100,
-        riskReduction: strategy.failureRiskReduction * 100,
-      };
-    });
-  }, [selectedAsset, planningHorizon, discountRate, electricityPrice, plantCapacity]);
-
-  // Calculate ROI comparing to reactive baseline
-  const reactiveNPV = strategyAnalysis.find(s => s.strategy.id === 'reactive')?.npv || 0;
-  const strategyWithROI = strategyAnalysis.map(s => ({
-    ...s,
-    roi: reactiveNPV > 0 ? ((reactiveNPV - s.npv) / s.npv) * 100 : 0,
-    savings: reactiveNPV - s.npv,
-  }));
-
-  // Portfolio-wide analysis
-  const portfolioAnalysis = useMemo(() => {
-    const strategies = ['reactive', 'preventive', 'predictive', 'proactive'];
-    
-    return strategies.map(stratId => {
-      const strategy = maintenanceStrategies.find(s => s.id === stratId)!;
-      
-      let totalNPV = 0;
-      let totalDowntimeCost = 0;
-      let totalMaintenanceCost = 0;
-      
-      assets.forEach(asset => {
-        const baseReplacementCost = asset.costSchedule.replacementCostMillions;
-        const baseAnnualMaintenance = asset.costSchedule.annualMaintenanceCostMillions;
-        const baseDowntime = asset.costSchedule.downtimeWeeks;
-        const weeklyRevenue = (plantCapacity * 168 * electricityPrice * 0.8) / 1000000;
-        
-        const annualMaintenanceCost = baseAnnualMaintenance * (1 + strategy.costMultiplier);
-        const expectedDowntime = baseDowntime * (1 - strategy.downtimeReduction);
-        const downtimeCostPerEvent = expectedDowntime * weeklyRevenue;
-        
-        const baseFailureRate = asset.riskLevel === 'Critical' ? 0.15 : 
-                                asset.riskLevel === 'High' ? 0.1 :
-                                asset.riskLevel === 'Medium' ? 0.05 : 0.02;
-        const adjustedFailureRate = baseFailureRate * (1 - strategy.failureRiskReduction);
-        
-        for (let year = 1; year <= planningHorizon; year++) {
-          const discountFactor = Math.pow(1 + discountRate / 100, -year);
-          totalMaintenanceCost += annualMaintenanceCost;
-          totalNPV += annualMaintenanceCost * discountFactor;
-          
-          const expectedFailureCost = adjustedFailureRate * (baseReplacementCost + downtimeCostPerEvent);
-          totalDowntimeCost += adjustedFailureRate * downtimeCostPerEvent;
-          totalNPV += expectedFailureCost * discountFactor;
-        }
-      });
-      
-      return {
-        name: strategy.name.split(' ')[0],
-        fullName: strategy.name,
-        npv: totalNPV,
-        maintenanceCost: totalMaintenanceCost,
-        downtimeCost: totalDowntimeCost,
-        availability: (1 - strategy.downtimeReduction * 0.1) * 100,
-      };
-    });
-  }, [assets, planningHorizon, discountRate, electricityPrice, plantCapacity]);
+  // Comparison scenario analysis
+  const { 
+    strategyWithROI: comparisonStrategyWithROI, 
+    portfolioAnalysis: comparisonPortfolioAnalysis 
+  } = useStrategyAnalysis({
+    assets: comparisonAssets || [],
+    selectedAsset: comparisonSelectedAsset,
+    planningHorizon,
+    discountRate,
+    electricityPrice,
+    plantCapacity,
+  });
 
   // Cost breakdown for selected strategy
   const costBreakdownData = useMemo(() => {
@@ -243,41 +109,11 @@ export const CostBenefitAnalysis = () => {
   // Radar data for strategy comparison
   const radarData = useMemo(() => {
     return [
-      {
-        metric: 'Cost Efficiency',
-        Reactive: 100,
-        Preventive: 70,
-        Predictive: 60,
-        Proactive: 50,
-      },
-      {
-        metric: 'Availability',
-        Reactive: 40,
-        Preventive: 60,
-        Predictive: 85,
-        Proactive: 95,
-      },
-      {
-        metric: 'Risk Reduction',
-        Reactive: 10,
-        Preventive: 50,
-        Predictive: 75,
-        Proactive: 90,
-      },
-      {
-        metric: 'Predictability',
-        Reactive: 20,
-        Preventive: 60,
-        Predictive: 80,
-        Proactive: 95,
-      },
-      {
-        metric: 'Flexibility',
-        Reactive: 90,
-        Preventive: 50,
-        Predictive: 70,
-        Proactive: 60,
-      },
+      { metric: 'Cost Efficiency', Reactive: 100, Preventive: 70, Predictive: 60, Proactive: 50 },
+      { metric: 'Availability', Reactive: 40, Preventive: 60, Predictive: 85, Proactive: 95 },
+      { metric: 'Risk Reduction', Reactive: 10, Preventive: 50, Predictive: 75, Proactive: 90 },
+      { metric: 'Predictability', Reactive: 20, Preventive: 60, Predictive: 80, Proactive: 95 },
+      { metric: 'Flexibility', Reactive: 90, Preventive: 50, Predictive: 70, Proactive: 60 },
     ];
   }, []);
 
@@ -293,7 +129,7 @@ export const CostBenefitAnalysis = () => {
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flp-card p-6">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between mb-4">
           <div>
             <h2 className="text-2xl font-bold flex items-center gap-2">
               <Calculator className="w-6 h-6 text-primary" />
@@ -307,6 +143,29 @@ export const CostBenefitAnalysis = () => {
             ISO 55000 Aligned
           </Badge>
         </div>
+        
+        {/* Scenario Header */}
+        <ScenarioHeader
+          showCompareToggle={true}
+          localCompareMode={localCompareMode}
+          onLocalCompareModeChange={setLocalCompareMode}
+        />
+        
+        {effectiveCompareMode && (
+          <div className="mt-3 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+            <p className="text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">Comparison Mode Active:</span>{' '}
+              Viewing cost-benefit analysis for{' '}
+              <span className="font-medium" style={{ color: activeScenario?.color }}>
+                {activeScenario?.name}
+              </span>{' '}
+              vs{' '}
+              <span className="font-medium" style={{ color: comparisonScenario?.color }}>
+                {comparisonScenario?.name}
+              </span>
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Parameters Panel */}
@@ -404,78 +263,123 @@ export const CostBenefitAnalysis = () => {
         <TabsContent value="comparison" className="space-y-4">
           {/* Strategy Cards */}
           <div className="grid grid-cols-4 gap-4">
-            {strategyWithROI.map((analysis, idx) => (
-              <Card 
-                key={analysis.strategy.id}
-                className={cn(
-                  'relative overflow-hidden transition-all',
-                  analysis.strategy.id === 'proactive' && 'ring-2 ring-primary'
-                )}
-              >
-                {analysis.strategy.id === 'proactive' && (
-                  <div className="absolute top-2 right-2">
-                    <Badge className="bg-primary text-primary-foreground text-xs">
-                      Recommended
-                    </Badge>
-                  </div>
-                )}
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {analysis.strategy.name.split(' ')[0]}
-                  </CardTitle>
-                  <p className="text-xs text-muted-foreground line-clamp-2">
-                    {analysis.strategy.description}
-                  </p>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <DollarSign className="w-3 h-3" />
-                        NPV (Total Cost)
-                      </span>
-                      <span className="font-semibold">${analysis.npv.toFixed(1)}M</span>
+            {strategyWithROI.map((analysis, idx) => {
+              const comparisonAnalysis = effectiveCompareMode 
+                ? comparisonStrategyWithROI.find(c => c.strategy.id === analysis.strategy.id)
+                : null;
+              
+              return (
+                <Card 
+                  key={analysis.strategy.id}
+                  className={cn(
+                    'relative overflow-hidden transition-all',
+                    analysis.strategy.id === 'proactive' && 'ring-2 ring-primary'
+                  )}
+                >
+                  {analysis.strategy.id === 'proactive' && (
+                    <div className="absolute top-2 right-2">
+                      <Badge className="bg-primary text-primary-foreground text-xs">
+                        Recommended
+                      </Badge>
+                    </div>
+                  )}
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      {analysis.strategy.name.split(' ')[0]}
+                    </CardTitle>
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {analysis.strategy.description}
+                    </p>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <DollarSign className="w-3 h-3" />
+                          NPV (Total Cost)
+                        </span>
+                        <div className="text-right">
+                          <span className="font-semibold">${analysis.npv.toFixed(1)}M</span>
+                          {comparisonAnalysis && (
+                            <div className="mt-0.5">
+                              <DeltaIndicator
+                                value={analysis.npv}
+                                comparisonValue={comparisonAnalysis.npv}
+                                prefix="$"
+                                suffix="M"
+                                higherIsBetter={false}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <TrendingUp className="w-3 h-3" />
+                          Savings vs Reactive
+                        </span>
+                        <div className="text-right">
+                          <span className={cn(
+                            'font-semibold',
+                            analysis.savings > 0 ? 'text-status-nominal' : 'text-muted-foreground'
+                          )}>
+                            {analysis.savings > 0 ? '+' : ''}{analysis.savings.toFixed(1)}M
+                          </span>
+                          {comparisonAnalysis && (
+                            <div className="mt-0.5">
+                              <DeltaIndicator
+                                value={analysis.savings}
+                                comparisonValue={comparisonAnalysis.savings}
+                                prefix="$"
+                                suffix="M"
+                                higherIsBetter={true}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          Downtime Reduction
+                        </span>
+                        <span className="font-semibold">{analysis.availabilityGain.toFixed(0)}%</span>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3" />
+                          Risk Reduction
+                        </span>
+                        <span className="font-semibold">{analysis.riskReduction.toFixed(0)}%</span>
+                      </div>
                     </div>
                     
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <TrendingUp className="w-3 h-3" />
-                        Savings vs Reactive
-                      </span>
-                      <span className={cn(
-                        'font-semibold',
-                        analysis.savings > 0 ? 'text-status-nominal' : 'text-muted-foreground'
-                      )}>
-                        {analysis.savings > 0 ? '+' : ''}{analysis.savings.toFixed(1)}M
-                      </span>
+                    <div className="pt-2 border-t">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium">Annual Maintenance</span>
+                        <div className="text-right">
+                          <span className="text-sm font-bold">${analysis.annualMaintenanceCost.toFixed(1)}M/yr</span>
+                          {comparisonAnalysis && (
+                            <div className="mt-0.5">
+                              <DeltaIndicator
+                                value={analysis.annualMaintenanceCost}
+                                comparisonValue={comparisonAnalysis.annualMaintenanceCost}
+                                prefix="$"
+                                suffix="M"
+                                higherIsBetter={false}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        Downtime Reduction
-                      </span>
-                      <span className="font-semibold">{analysis.availabilityGain.toFixed(0)}%</span>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <AlertTriangle className="w-3 h-3" />
-                        Risk Reduction
-                      </span>
-                      <span className="font-semibold">{analysis.riskReduction.toFixed(0)}%</span>
-                    </div>
-                  </div>
-                  
-                  <div className="pt-2 border-t">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium">Annual Maintenance</span>
-                      <span className="text-sm font-bold">${analysis.annualMaintenanceCost.toFixed(1)}M/yr</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
           {/* Charts Row */}
@@ -483,17 +387,25 @@ export const CostBenefitAnalysis = () => {
             {/* NPV Comparison Bar Chart */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm">NPV Comparison (Lower is Better)</CardTitle>
+                <CardTitle className="text-sm">
+                  NPV Comparison (Lower is Better)
+                  {effectiveCompareMode && (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      — Comparing scenarios
+                    </span>
+                  )}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={strategyWithROI.map(s => ({
-                    name: s.strategy.name.split(' ')[0],
-                    npv: s.npv,
-                    maintenance: s.totalMaintenanceCost,
-                    downtime: s.totalDowntimeCost,
-                    replacement: s.totalReplacementCost,
-                  }))}>
+                  <BarChart data={strategyWithROI.map((s, idx) => {
+                    const compS = effectiveCompareMode ? comparisonStrategyWithROI[idx] : null;
+                    return {
+                      name: s.strategy.name.split(' ')[0],
+                      [`${activeScenario?.name || 'Active'}`]: s.npv,
+                      ...(compS && { [`${comparisonScenario?.name || 'Comparison'}`]: compS.npv }),
+                    };
+                  })}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                     <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `$${v}M`} />
@@ -506,9 +418,16 @@ export const CostBenefitAnalysis = () => {
                       }}
                     />
                     <Legend />
-                    <Bar dataKey="maintenance" name="Maintenance" stackId="a" fill="hsl(var(--chart-1))" />
-                    <Bar dataKey="downtime" name="Downtime" stackId="a" fill="hsl(var(--chart-2))" />
-                    <Bar dataKey="replacement" name="Replacement" stackId="a" fill="hsl(var(--chart-3))" />
+                    <Bar 
+                      dataKey={activeScenario?.name || 'Active'} 
+                      fill={activeScenario?.color || 'hsl(var(--chart-1))'} 
+                    />
+                    {effectiveCompareMode && (
+                      <Bar 
+                        dataKey={comparisonScenario?.name || 'Comparison'} 
+                        fill={comparisonScenario?.color || 'hsl(var(--chart-2))'} 
+                      />
+                    )}
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -539,38 +458,102 @@ export const CostBenefitAnalysis = () => {
 
         <TabsContent value="portfolio" className="space-y-4">
           <div className="grid grid-cols-4 gap-4">
-            {portfolioAnalysis.map((data, idx) => (
-              <Card key={data.name}>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm">{data.fullName}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">Total NPV</span>
-                      <span className="text-lg font-bold">${data.npv.toFixed(0)}M</span>
+            {portfolioAnalysis.map((data, idx) => {
+              const compData = effectiveCompareMode ? comparisonPortfolioAnalysis[idx] : null;
+              
+              return (
+                <Card key={data.name}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm">{data.fullName}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">Total NPV</span>
+                        <div className="text-right">
+                          <span className="text-lg font-bold">${data.npv.toFixed(0)}M</span>
+                          {compData && (
+                            <div className="mt-0.5">
+                              <DeltaIndicator
+                                value={data.npv}
+                                comparisonValue={compData.npv}
+                                prefix="$"
+                                suffix="M"
+                                higherIsBetter={false}
+                                decimals={0}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">Maintenance</span>
+                        <div className="text-right">
+                          <span className="font-medium">${data.maintenanceCost.toFixed(0)}M</span>
+                          {compData && (
+                            <div className="mt-0.5">
+                              <DeltaIndicator
+                                value={data.maintenanceCost}
+                                comparisonValue={compData.maintenanceCost}
+                                prefix="$"
+                                suffix="M"
+                                higherIsBetter={false}
+                                decimals={0}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">Downtime Cost</span>
+                        <div className="text-right">
+                          <span className="font-medium">${data.downtimeCost.toFixed(0)}M</span>
+                          {compData && (
+                            <div className="mt-0.5">
+                              <DeltaIndicator
+                                value={data.downtimeCost}
+                                comparisonValue={compData.downtimeCost}
+                                prefix="$"
+                                suffix="M"
+                                higherIsBetter={false}
+                                decimals={0}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">Maintenance</span>
-                      <span className="font-medium">${data.maintenanceCost.toFixed(0)}M</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">Downtime Cost</span>
-                      <span className="font-medium">${data.downtimeCost.toFixed(0)}M</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm">Portfolio-Wide Cost Comparison</CardTitle>
+              <CardTitle className="text-sm">
+                Portfolio-Wide Cost Comparison
+                {effectiveCompareMode && (
+                  <span className="text-xs font-normal text-muted-foreground ml-2">
+                    — {activeScenario?.name} vs {comparisonScenario?.name}
+                  </span>
+                )}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={350}>
-                <BarChart data={portfolioAnalysis}>
+                <BarChart data={portfolioAnalysis.map((p, idx) => {
+                  const compP = effectiveCompareMode ? comparisonPortfolioAnalysis[idx] : null;
+                  return {
+                    name: p.name,
+                    [`${activeScenario?.name} Maintenance`]: p.maintenanceCost,
+                    [`${activeScenario?.name} Downtime`]: p.downtimeCost,
+                    ...(compP && {
+                      [`${comparisonScenario?.name} Maintenance`]: compP.maintenanceCost,
+                      [`${comparisonScenario?.name} Downtime`]: compP.downtimeCost,
+                    }),
+                  };
+                })}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis dataKey="name" />
                   <YAxis tickFormatter={(v) => `$${v}M`} />
@@ -583,8 +566,26 @@ export const CostBenefitAnalysis = () => {
                     }}
                   />
                   <Legend />
-                  <Bar dataKey="maintenanceCost" name="Maintenance Cost" fill="hsl(var(--chart-1))" />
-                  <Bar dataKey="downtimeCost" name="Downtime Cost" fill="hsl(var(--chart-2))" />
+                  <Bar 
+                    dataKey={`${activeScenario?.name} Maintenance`} 
+                    fill={activeScenario?.color || 'hsl(var(--chart-1))'} 
+                  />
+                  <Bar 
+                    dataKey={`${activeScenario?.name} Downtime`} 
+                    fill="hsl(var(--chart-2))" 
+                  />
+                  {effectiveCompareMode && (
+                    <>
+                      <Bar 
+                        dataKey={`${comparisonScenario?.name} Maintenance`} 
+                        fill={comparisonScenario?.color || 'hsl(var(--chart-3))'} 
+                      />
+                      <Bar 
+                        dataKey={`${comparisonScenario?.name} Downtime`} 
+                        fill="hsl(var(--chart-4))" 
+                      />
+                    </>
+                  )}
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -595,7 +596,14 @@ export const CostBenefitAnalysis = () => {
           <div className="grid grid-cols-2 gap-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm">Cost Distribution (Proactive Strategy)</CardTitle>
+                <CardTitle className="text-sm">
+                  Cost Distribution (Proactive Strategy)
+                  {effectiveCompareMode && (
+                    <span className="text-xs font-normal text-muted-foreground ml-2">
+                      — {activeScenario?.name}
+                    </span>
+                  )}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -632,51 +640,81 @@ export const CostBenefitAnalysis = () => {
                 <CardTitle className="text-sm">Key Insights</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {strategyWithROI.filter(s => s.strategy.id === 'proactive').map(proactive => (
-                  <div key="insights" className="space-y-3">
-                    <div className="flex items-start gap-3 p-3 bg-status-nominal/10 rounded-lg">
-                      <CheckCircle className="w-5 h-5 text-status-nominal mt-0.5" />
-                      <div>
-                        <p className="font-medium text-sm">Optimal Strategy: Proactive (RCM)</p>
-                        <p className="text-xs text-muted-foreground">
-                          Saves ${proactive.savings.toFixed(1)}M over {planningHorizon} years compared to reactive maintenance
+                {strategyWithROI.filter(s => s.strategy.id === 'proactive').map(proactive => {
+                  const compProactive = effectiveCompareMode 
+                    ? comparisonStrategyWithROI.find(s => s.strategy.id === 'proactive')
+                    : null;
+                  
+                  return (
+                    <div key="insights" className="space-y-3">
+                      <div className="flex items-start gap-3 p-3 bg-status-nominal/10 rounded-lg">
+                        <CheckCircle className="w-5 h-5 text-status-nominal mt-0.5" />
+                        <div className="flex-1">
+                          <p className="font-medium text-sm">
+                            Optimal Strategy: Proactive (RCM)
+                            {effectiveCompareMode && (
+                              <span className="text-xs font-normal text-muted-foreground ml-2">
+                                in {activeScenario?.name}
+                              </span>
+                            )}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Saves ${proactive.savings.toFixed(1)}M over {planningHorizon} years compared to reactive maintenance
+                            {compProactive && (
+                              <span className="ml-1">
+                                (
+                                <span className={cn(
+                                  proactive.savings > compProactive.savings 
+                                    ? 'text-status-nominal' 
+                                    : 'text-destructive'
+                                )}>
+                                  {proactive.savings > compProactive.savings ? '+' : ''}
+                                  ${(proactive.savings - compProactive.savings).toFixed(1)}M
+                                </span>
+                                {' '}vs {comparisonScenario?.name})
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
+                        <Zap className="w-5 h-5 text-primary mt-0.5" />
+                        <div>
+                          <p className="font-medium text-sm">Availability Improvement</p>
+                          <p className="text-xs text-muted-foreground">
+                            {proactive.availabilityGain.toFixed(0)}% reduction in unplanned downtime translates to 
+                            additional revenue of ~${(proactive.totalDowntimeCost * 0.85).toFixed(1)}M
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
+                        <AlertTriangle className="w-5 h-5 text-status-warning mt-0.5" />
+                        <div>
+                          <p className="font-medium text-sm">Risk Mitigation Value</p>
+                          <p className="text-xs text-muted-foreground">
+                            {proactive.riskReduction.toFixed(0)}% failure risk reduction protects against 
+                            catastrophic loss scenarios valued at ${(selectedAsset?.costSchedule.replacementCostMillions || 0) * 2}M+
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-4 p-4 border rounded-lg">
+                        <p className="text-sm font-medium mb-2">Recommendation</p>
+                        <p className="text-sm text-muted-foreground">
+                          For <span className="font-medium text-foreground">{selectedAsset?.name}</span>
+                          {effectiveCompareMode && (
+                            <span className="text-xs"> in {activeScenario?.name}</span>
+                          )}
+                          , implement a proactive RCM strategy with condition monitoring. The higher upfront 
+                          investment of ${proactive.annualMaintenanceCost.toFixed(1)}M/year is justified by 
+                          significantly reduced lifecycle costs and improved plant availability.
                         </p>
                       </div>
                     </div>
-                    
-                    <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
-                      <Zap className="w-5 h-5 text-primary mt-0.5" />
-                      <div>
-                        <p className="font-medium text-sm">Availability Improvement</p>
-                        <p className="text-xs text-muted-foreground">
-                          {proactive.availabilityGain.toFixed(0)}% reduction in unplanned downtime translates to 
-                          additional revenue of ~${(proactive.totalDowntimeCost * 0.85).toFixed(1)}M
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
-                      <AlertTriangle className="w-5 h-5 text-status-warning mt-0.5" />
-                      <div>
-                        <p className="font-medium text-sm">Risk Mitigation Value</p>
-                        <p className="text-xs text-muted-foreground">
-                          {proactive.riskReduction.toFixed(0)}% failure risk reduction protects against 
-                          catastrophic loss scenarios valued at ${(selectedAsset?.costSchedule.replacementCostMillions || 0) * 2}M+
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-4 p-4 border rounded-lg">
-                      <p className="text-sm font-medium mb-2">Recommendation</p>
-                      <p className="text-sm text-muted-foreground">
-                        For <span className="font-medium text-foreground">{selectedAsset?.name}</span>, 
-                        implement a proactive RCM strategy with condition monitoring. The higher upfront 
-                        investment of ${proactive.annualMaintenanceCost.toFixed(1)}M/year is justified by 
-                        significantly reduced lifecycle costs and improved plant availability.
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </CardContent>
             </Card>
           </div>
