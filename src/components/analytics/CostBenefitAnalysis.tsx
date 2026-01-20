@@ -39,9 +39,11 @@ import {
   Calculator,
   Target,
   Zap,
+  Activity,
 } from 'lucide-react';
 import { ScenarioHeader } from './ScenarioHeader';
 import { DeltaIndicator } from './DeltaIndicator';
+import { SensitivityAnalysis } from './SensitivityAnalysis';
 import { useStrategyAnalysis, maintenanceStrategies } from '@/hooks/useStrategyAnalysis';
 
 export const CostBenefitAnalysis = () => {
@@ -258,6 +260,10 @@ export const CostBenefitAnalysis = () => {
           <TabsTrigger value="comparison">Strategy Comparison</TabsTrigger>
           <TabsTrigger value="portfolio">Portfolio Analysis</TabsTrigger>
           <TabsTrigger value="breakdown">Cost Breakdown</TabsTrigger>
+          <TabsTrigger value="sensitivity" className="flex items-center gap-1.5">
+            <Activity className="w-3.5 h-3.5" />
+            Sensitivity
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="comparison" className="space-y-4">
@@ -718,6 +724,17 @@ export const CostBenefitAnalysis = () => {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        {/* Sensitivity Analysis Tab */}
+        <TabsContent value="sensitivity">
+          <SensitivityAnalysis
+            selectedAsset={selectedAsset}
+            planningHorizon={planningHorizon}
+            discountRate={discountRate}
+            electricityPrice={electricityPrice}
+            plantCapacity={plantCapacity}
+          />
         </TabsContent>
       </Tabs>
     </div>
