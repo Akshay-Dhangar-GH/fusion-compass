@@ -40,10 +40,12 @@ import {
   Target,
   Zap,
   Activity,
+  Wand2,
 } from 'lucide-react';
 import { ScenarioHeader } from './ScenarioHeader';
 import { DeltaIndicator } from './DeltaIndicator';
 import { SensitivityAnalysis } from './SensitivityAnalysis';
+import { WhatIfBuilder } from './WhatIfBuilder';
 import { useStrategyAnalysis, maintenanceStrategies } from '@/hooks/useStrategyAnalysis';
 
 export const CostBenefitAnalysis = () => {
@@ -263,6 +265,10 @@ export const CostBenefitAnalysis = () => {
           <TabsTrigger value="sensitivity" className="flex items-center gap-1.5">
             <Activity className="w-3.5 h-3.5" />
             Sensitivity
+          </TabsTrigger>
+          <TabsTrigger value="whatif" className="flex items-center gap-1.5">
+            <Wand2 className="w-3.5 h-3.5" />
+            What-If Builder
           </TabsTrigger>
         </TabsList>
 
@@ -730,6 +736,16 @@ export const CostBenefitAnalysis = () => {
         <TabsContent value="sensitivity">
           <SensitivityAnalysis
             selectedAsset={selectedAsset}
+            planningHorizon={planningHorizon}
+            discountRate={discountRate}
+            electricityPrice={electricityPrice}
+            plantCapacity={plantCapacity}
+          />
+        </TabsContent>
+
+        {/* What-If Builder Tab */}
+        <TabsContent value="whatif">
+          <WhatIfBuilder
             planningHorizon={planningHorizon}
             discountRate={discountRate}
             electricityPrice={electricityPrice}
