@@ -48,7 +48,9 @@ export interface CostScheduleParams {
 export interface FusionAsset {
   id: string;
   name: string;
-  category: 'Plasma-Facing' | 'Magnets' | 'Blanket' | 'Structural' | 'Auxiliary';
+  // Widened to a string so PWR (and other plant types) can supply their own categories
+  category: string;
+
   
   // Asset Identity & Design Intent
   functionalRole: string;
@@ -663,9 +665,10 @@ export const getAssetById = (id: string): FusionAsset | undefined => {
   return fusionAssets.find(asset => asset.id === id);
 };
 
-export const getAssetsByCategory = (category: FusionAsset['category']): FusionAsset[] => {
+export const getAssetsByCategory = (category: string): FusionAsset[] => {
   return fusionAssets.filter(asset => asset.category === category);
 };
+
 
 export const getCriticalAssets = (): FusionAsset[] => {
   return fusionAssets.filter(asset => asset.riskLevel === 'Critical');

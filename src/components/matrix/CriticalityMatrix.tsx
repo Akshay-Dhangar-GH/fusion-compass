@@ -1,4 +1,5 @@
 import { useScenario } from '@/contexts/ScenarioContext';
+import { usePlant } from '@/contexts/PlantContext';
 import { FusionAsset } from '@/data/fusionAssets';
 import { cn } from '@/lib/utils';
 import { useState, useMemo } from 'react';
@@ -9,6 +10,7 @@ interface CriticalityMatrixProps {
   onSelectAsset: (assetId: string) => void;
 }
 
+
 export const CriticalityMatrix = ({ onSelectAsset }: CriticalityMatrixProps) => {
   const { 
     getActiveAssets, 
@@ -17,6 +19,8 @@ export const CriticalityMatrix = ({ onSelectAsset }: CriticalityMatrixProps) => 
     activeScenarioId, 
     comparisonScenarioId 
   } = useScenario();
+  const { terminology } = usePlant();
+
   
   const assets = getActiveAssets();
   const comparisonAssets = getComparisonAssets();
@@ -131,11 +135,12 @@ export const CriticalityMatrix = ({ onSelectAsset }: CriticalityMatrixProps) => 
       <div className="flp-card p-6">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-foreground">Fusion Asset Criticality Matrix</h2>
+            <h2 className="text-2xl font-bold text-foreground">{terminology.matrixTitle}</h2>
             <p className="text-muted-foreground mt-1">
               Prioritisation tool for instrumentation, inspection, design maturity, and R&D investment
             </p>
           </div>
+
         </div>
         
         {/* Scenario Header */}
@@ -222,9 +227,10 @@ export const CriticalityMatrix = ({ onSelectAsset }: CriticalityMatrixProps) => 
               {/* X-axis label */}
               <div className="text-center mb-4">
                 <span className="text-sm font-medium text-muted-foreground">
-                  Lower Neutron Uncertainty → Higher Neutron Uncertainty
+                  {terminology.matrixXAxisLabel}
                 </span>
               </div>
+
 
               {/* Grid */}
               <div className="relative bg-muted/30 rounded-xl p-4">
@@ -393,7 +399,8 @@ export const CriticalityMatrix = ({ onSelectAsset }: CriticalityMatrixProps) => 
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <p className="text-xs text-muted-foreground">Neutron Unc.</p>
+                    <p className="text-xs text-muted-foreground">{terminology.uncertaintyAxisShort}</p>
+
                     <div className="flex items-center gap-2">
                       <p className="font-semibold">{hoveredAsset.neutronDamageUncertainty}/5</p>
                       {hoveredComparison && hoveredAsset.neutronDamageUncertainty !== hoveredComparison.neutronDamageUncertainty && (

@@ -1,4 +1,6 @@
-import { fusionAssets, FusionAsset } from '@/data/fusionAssets';
+import { useScenario } from '@/contexts/ScenarioContext';
+
+
 import { cn } from '@/lib/utils';
 import { ChevronRight, AlertTriangle, AlertCircle, Info, CheckCircle } from 'lucide-react';
 
@@ -21,6 +23,9 @@ const riskColors = {
 };
 
 export const AssetSummaryTable = ({ onSelectAsset }: AssetSummaryTableProps) => {
+  const { getActiveAssets } = useScenario();
+  const assets = getActiveAssets();
+
   return (
     <div className="flp-card overflow-hidden">
       <div className="p-6 border-b border-border">
@@ -44,7 +49,7 @@ export const AssetSummaryTable = ({ onSelectAsset }: AssetSummaryTableProps) => 
             </tr>
           </thead>
           <tbody>
-            {fusionAssets.map((asset, index) => {
+            {assets.map((asset, index) => {
               const RiskIcon = riskIcons[asset.riskLevel];
               
               return (
