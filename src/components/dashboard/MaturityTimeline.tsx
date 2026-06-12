@@ -1,13 +1,16 @@
-import { fusionAssets } from '@/data/fusionAssets';
 import { cn } from '@/lib/utils';
+import { useScenario } from '@/contexts/ScenarioContext';
 
 const maturityLevels = ['Concept', 'Design', 'Prototype', 'Qualified', 'Operational'] as const;
 
 export const MaturityTimeline = () => {
+  const { getActiveAssets } = useScenario();
+  const assets = getActiveAssets();
   const maturityCounts = maturityLevels.reduce((acc, level) => {
-    acc[level] = fusionAssets.filter(a => a.maturityLevel === level).length;
+    acc[level] = assets.filter(a => a.maturityLevel === level).length;
     return acc;
   }, {} as Record<string, number>);
+
 
   return (
     <div className="flp-card p-6">
@@ -49,8 +52,9 @@ export const MaturityTimeline = () => {
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Average Confidence</span>
           <span className="font-semibold text-foreground">
-            {Math.round(fusionAssets.reduce((sum, a) => sum + a.confidenceScore, 0) / fusionAssets.length)}%
+            {Math.round(assets.reduce((sum, a) => sum + a.confidenceScore, 0) / Math.max(assets.length, 1))}%
           </span>
+
         </div>
       </div>
     </div>

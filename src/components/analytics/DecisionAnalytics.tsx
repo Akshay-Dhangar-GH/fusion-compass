@@ -1,4 +1,4 @@
-import { fusionAssets } from '@/data/fusionAssets';
+import { useScenario } from '@/contexts/ScenarioContext';
 import { cn } from '@/lib/utils';
 import { 
   BarChart3, 
@@ -12,12 +12,14 @@ import {
 } from 'lucide-react';
 
 export const DecisionAnalytics = () => {
-  const prioritizedAssets = [...fusionAssets].sort((a, b) => {
-    // Priority score: higher uncertainty + harder to replace = higher priority
+  const { getActiveAssets } = useScenario();
+  const assets = getActiveAssets();
+  const prioritizedAssets = [...assets].sort((a, b) => {
     const scoreA = a.neutronDamageUncertainty + a.replaceabilityDifficulty + a.systemValueImpact;
     const scoreB = b.neutronDamageUncertainty + b.replaceabilityDifficulty + b.systemValueImpact;
     return scoreB - scoreA;
   });
+
 
   return (
     <div className="space-y-8 animate-fade-in">

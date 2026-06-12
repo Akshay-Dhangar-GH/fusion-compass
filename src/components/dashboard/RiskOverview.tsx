@@ -1,14 +1,17 @@
-import { fusionAssets } from '@/data/fusionAssets';
 import { AlertTriangle, AlertCircle, Info, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useScenario } from '@/contexts/ScenarioContext';
 
 export const RiskOverview = () => {
+  const { getActiveAssets } = useScenario();
+  const assets = getActiveAssets();
   const riskCounts = {
-    Critical: fusionAssets.filter(a => a.riskLevel === 'Critical').length,
-    High: fusionAssets.filter(a => a.riskLevel === 'High').length,
-    Medium: fusionAssets.filter(a => a.riskLevel === 'Medium').length,
-    Low: fusionAssets.filter(a => a.riskLevel === 'Low').length,
+    Critical: assets.filter(a => a.riskLevel === 'Critical').length,
+    High: assets.filter(a => a.riskLevel === 'High').length,
+    Medium: assets.filter(a => a.riskLevel === 'Medium').length,
+    Low: assets.filter(a => a.riskLevel === 'Low').length,
   };
+
 
   const riskConfig = {
     Critical: { icon: AlertTriangle, color: 'bg-status-critical', textColor: 'text-status-critical' },
@@ -24,7 +27,7 @@ export const RiskOverview = () => {
         {(Object.keys(riskCounts) as Array<keyof typeof riskCounts>).map((level) => {
           const config = riskConfig[level];
           const Icon = config.icon;
-          const percentage = (riskCounts[level] / fusionAssets.length) * 100;
+          const percentage = assets.length ? (riskCounts[level] / assets.length) * 100 : 0;
           
           return (
             <div key={level} className="flex items-center gap-3">
