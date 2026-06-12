@@ -49,9 +49,10 @@ export const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
             <Atom className="w-6 h-6 text-sidebar-primary-foreground" />
           </div>
           <div>
-            <h1 className="font-bold text-lg leading-tight">Fusion Lifecycle</h1>
+            <h1 className="font-bold text-lg leading-tight">{terminology.productName.replace(' Lifecycle Passport', ' Lifecycle')}</h1>
             <p className="text-xs text-sidebar-foreground/60">Passport System</p>
           </div>
+
         </div>
       </div>
 
@@ -85,15 +86,16 @@ export const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
       <div className="p-4 border-t border-sidebar-border">
         <div className="grid grid-cols-2 gap-3 text-center">
           <div className="p-3 rounded-lg bg-sidebar-accent">
-            <p className="text-2xl font-bold text-sidebar-primary">2</p>
+            <p className="text-2xl font-bold text-sidebar-primary">{assets.filter(a => a.riskLevel === 'Critical').length}</p>
             <p className="text-xs text-sidebar-foreground/60">Critical</p>
           </div>
           <div className="p-3 rounded-lg bg-sidebar-accent">
-            <p className="text-2xl font-bold text-sidebar-accent-foreground">6</p>
+            <p className="text-2xl font-bold text-sidebar-accent-foreground">{assets.length}</p>
             <p className="text-xs text-sidebar-foreground/60">Assets</p>
           </div>
         </div>
       </div>
+
 
       {/* Footer */}
       <div className="p-4 border-t border-sidebar-border">
