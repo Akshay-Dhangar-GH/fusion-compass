@@ -1,5 +1,5 @@
-import { FusionAsset } from '@/data/fusionAssets';
 import { useScenario } from '@/contexts/ScenarioContext';
+
 
 import { cn } from '@/lib/utils';
 import { ChevronRight, AlertTriangle, AlertCircle, Info, CheckCircle } from 'lucide-react';
