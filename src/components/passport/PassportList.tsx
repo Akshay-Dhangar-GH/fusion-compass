@@ -1,21 +1,31 @@
-import { fusionAssets, FusionAsset } from '@/data/fusionAssets';
+import { FusionAsset } from '@/data/fusionAssets';
 import { cn } from '@/lib/utils';
 import { ChevronRight, Filter } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
+import { useScenario } from '@/contexts/ScenarioContext';
+import { usePlant } from '@/contexts/PlantContext';
 
 interface PassportListProps {
   onSelectAsset: (assetId: string) => void;
 }
 
-const categories = ['All', 'Plasma-Facing', 'Magnets', 'Blanket', 'Structural', 'Auxiliary'] as const;
-
 export const PassportList = ({ onSelectAsset }: PassportListProps) => {
+  const { getActiveAssets } = useScenario();
+  const { terminology } = usePlant();
+  const assets = getActiveAssets();
   const [activeCategory, setActiveCategory] = useState<string>('All');
 
-  const filteredAssets = activeCategory === 'All' 
-    ? fusionAssets 
-    : fusionAssets.filter(a => a.category === activeCategory);
+  const categories = useMemo(
+    () => ['All', ...Array.from(new Set(assets.map(a => a.category)))],
+    [assets],
+  );
+
+  const filteredAssets = activeCategory === 'All'
+    ? assets
+    : assets.filter(a => a.category === activeCategory);
+
+
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -23,8 +33,9 @@ export const PassportList = ({ onSelectAsset }: PassportListProps) => {
         <div>
           <h2 className="text-2xl font-bold text-foreground">Asset Passports</h2>
           <p className="text-muted-foreground mt-1">
-            Comprehensive lifecycle documentation for critical fusion components
+            Comprehensive lifecycle documentation for critical {terminology.componentNoun}
           </p>
+
         </div>
       </div>
 
