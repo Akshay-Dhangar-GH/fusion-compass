@@ -1,4 +1,5 @@
 import { useScenario } from '@/contexts/ScenarioContext';
+import { usePlant } from '@/contexts/PlantContext';
 import { cn } from '@/lib/utils';
 import { 
   BarChart3, 
@@ -13,6 +14,8 @@ import {
 
 export const DecisionAnalytics = () => {
   const { getActiveAssets } = useScenario();
+  const { terminology } = usePlant();
+  const ACR = terminology.acronym;
   const assets = getActiveAssets();
   const prioritizedAssets = [...assets].sort((a, b) => {
     const scoreA = a.neutronDamageUncertainty + a.replaceabilityDifficulty + a.systemValueImpact;
@@ -108,9 +111,9 @@ export const DecisionAnalytics = () => {
         </div>
       </div>
 
-      {/* FLP Decision Support */}
+      {/* {ACR} Decision Support */}
       <div className="flp-card p-6">
-        <h3 className="font-semibold text-foreground mb-6">How the FLP Supports Decisions</h3>
+        <h3 className="font-semibold text-foreground mb-6">How the {ACR} Supports Decisions</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             {
@@ -212,7 +215,7 @@ export const DecisionAnalytics = () => {
                 phase: 'Phase 1: Design Stage',
                 timeline: '2024-2026',
                 actions: [
-                  'Establish baseline uncertainty for all FLP components',
+                  `Establish baseline uncertainty for all ${ACR} components`,
                   'Prioritise R&D investment based on criticality matrix',
                   'Define monitoring strategy requirements',
                 ],
