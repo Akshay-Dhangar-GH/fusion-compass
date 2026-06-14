@@ -24,6 +24,7 @@ const riskColors = {
 
 export const AssetSummaryTable = ({ onSelectAsset }: AssetSummaryTableProps) => {
   const { getActiveAssets } = useScenario();
+  const { terminology } = usePlant();
   const assets = getActiveAssets();
 
   return (
@@ -31,7 +32,7 @@ export const AssetSummaryTable = ({ onSelectAsset }: AssetSummaryTableProps) => 
       <div className="p-6 border-b border-border">
         <h3 className="font-semibold text-foreground">Asset Portfolio Overview</h3>
         <p className="text-sm text-muted-foreground mt-1">
-          Critical fusion components with lifecycle management status
+          Critical {terminology.componentNoun} with lifecycle management status
         </p>
       </div>
       
