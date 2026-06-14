@@ -1,4 +1,5 @@
 import { useScenario } from '@/contexts/ScenarioContext';
+import { usePlant } from '@/contexts/PlantContext';
 
 
 import { cn } from '@/lib/utils';
