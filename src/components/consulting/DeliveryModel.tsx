@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { usePlant } from '@/contexts/PlantContext';
 import { 
   Users, 
   FileText, 
@@ -13,12 +14,14 @@ import {
 } from 'lucide-react';
 
 export const DeliveryModel = () => {
+  const { terminology } = usePlant();
+  const ACR = terminology.acronym;
   return (
     <div className="space-y-8 animate-fade-in">
       <div>
         <h2 className="text-2xl font-bold text-foreground">Consulting Delivery Model</h2>
         <p className="text-muted-foreground mt-1">
-          Implementation framework for deploying the Fusion Lifecycle Passport in client engagements
+          {terminology.deliveryIntro}
         </p>
       </div>
 
@@ -34,20 +37,20 @@ export const DeliveryModel = () => {
                 'Asset inventory and classification',
                 'Stakeholder mapping',
                 'Current state assessment',
-                'Gap analysis against FLP framework',
+                'Gap analysis against ' + ACR + ' framework',
               ],
-              deliverables: ['Discovery Report', 'FLP Roadmap'],
+              deliverables: ['Discovery Report', ACR + ' Roadmap'],
             },
             {
               phase: '2. Framework Design',
               duration: '4-8 weeks',
               activities: [
-                'Customise FLP structure to client needs',
+                'Customise ' + ACR + ' structure to client needs',
                 'Define criticality matrix parameters',
                 'Design monitoring strategy templates',
                 'Establish decision rules',
               ],
-              deliverables: ['FLP Framework Document', 'Criticality Matrix'],
+              deliverables: [ACR + ' Framework Document', 'Criticality Matrix'],
             },
             {
               phase: '3. Passport Population',
@@ -156,7 +159,7 @@ export const DeliveryModel = () => {
           </h3>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              The FLP framework aligns with and enhances ISO 55000 asset management principles:
+              The {ACR} framework aligns with and enhances ISO 55000 asset management principles:
             </p>
             {[
               { principle: 'Value', alignment: 'Explicit system value dependency mapping for each asset' },
@@ -230,25 +233,18 @@ export const DeliveryModel = () => {
         </div>
       </div>
 
-      {/* Why Fusion is a Forcing Function */}
+      {/* Forcing Function call-out */}
       <div className="bg-primary rounded-2xl p-8 text-primary-foreground">
         <div className="max-w-3xl">
           <Award className="w-10 h-10 mb-4 opacity-80" />
           <h3 className="text-xl font-bold mb-3">
-            Why Fusion is a Forcing Function for Better Nuclear Asset Management
+            {terminology.forcingFunctionTitle}
           </h3>
           <p className="text-primary-foreground/80 leading-relaxed mb-6">
-            The extreme uncertainty inherent in fusion FOAK programmes demands an asset management 
-            approach that is more rigorous, more explicit about unknowns, and more decision-focused 
-            than traditional nuclear practice. The disciplines developed for fusion directly transfer 
-            to improving asset management across SMRs, life extensions, and the broader nuclear fleet.
+            {terminology.forcingFunctionBody}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              'Uncertainty-explicit thinking',
-              'Value of information mindset',
-              'Design-stage AM integration',
-            ].map((point, i) => (
+            {terminology.forcingFunctionBullets.map((point, i) => (
               <div key={i} className="flex items-center gap-2 text-sm">
                 <CheckCircle className="w-4 h-4" />
                 {point}

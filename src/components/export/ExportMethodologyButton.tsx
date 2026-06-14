@@ -1,10 +1,18 @@
 import { Button } from '@/components/ui/button';
 import { FileText } from 'lucide-react';
 import { generateMethodologyPDF } from '@/utils/generateMethodologyPDF';
+import { generatePWRMethodologyPDF } from '@/utils/generatePWRMethodologyPDF';
+import { usePlant } from '@/contexts/PlantContext';
 
 export function ExportMethodologyButton() {
+  const { plantType } = usePlant();
+
   const handleExport = () => {
-    generateMethodologyPDF();
+    if (plantType === 'pwr') {
+      generatePWRMethodologyPDF();
+    } else {
+      generateMethodologyPDF();
+    }
   };
 
   return (

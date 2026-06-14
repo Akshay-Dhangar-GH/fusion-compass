@@ -49,8 +49,8 @@ export const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
             <Atom className="w-6 h-6 text-sidebar-primary-foreground" />
           </div>
           <div>
-            <h1 className="font-bold text-lg leading-tight">{terminology.productName.replace(' Lifecycle Passport', ' Lifecycle')}</h1>
-            <p className="text-xs text-sidebar-foreground/60">Passport System</p>
+            <h1 className="font-bold text-base leading-tight">Nuclear Asset</h1>
+            <p className="text-xs text-sidebar-foreground/60">Lifecycle Passport System</p>
           </div>
 
         </div>
