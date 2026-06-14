@@ -49,6 +49,16 @@ const FUSION_TERMS: PlantTerminology = {
     { level: 'warning', title: 'Maintenance Windows', description: 'Divertor replacement frequency may limit operational flexibility' },
     { level: 'nominal', title: 'Fuel Self-Sufficiency', description: 'Tritium breeding strategy aligned with long-term fuel security' },
   ],
+  acronym: 'FLP',
+  deliveryIntro: 'Implementation framework for deploying the Fusion Lifecycle Passport in client engagements',
+  forcingFunctionTitle: 'Why Fusion is a Forcing Function for Better Nuclear Asset Management',
+  forcingFunctionBody:
+    'The extreme uncertainty inherent in fusion FOAK programmes demands an asset management approach that is more rigorous, more explicit about unknowns, and more decision-focused than traditional nuclear practice. The disciplines developed for fusion directly transfer to improving asset management across SMRs, life extensions, and the broader nuclear fleet.',
+  forcingFunctionBullets: [
+    'Uncertainty-explicit thinking',
+    'Value of information mindset',
+    'Design-stage AM integration',
+  ],
 };
 
 const PWR_TERMS: PlantTerminology = {
@@ -73,6 +83,16 @@ const PWR_TERMS: PlantTerminology = {
     { level: 'critical', title: 'Capacity Factor Target', description: 'Outage scope on SG and turbine determines achievable >90% capacity factor' },
     { level: 'warning', title: 'Forced Outage Risk', description: 'PWSCC indications on DMWs and CRDM nozzles drive unplanned outage probability' },
     { level: 'nominal', title: 'Long-Term Operation Case', description: 'RPV embrittlement trend supports licensing beyond 60 years' },
+  ],
+  acronym: 'PLP',
+  deliveryIntro: 'Implementation framework for deploying the PWR Lifecycle Passport in client engagements',
+  forcingFunctionTitle: 'Why Disciplined Asset Management is Critical for the PWR Fleet',
+  forcingFunctionBody:
+    'Long-term operation, life extension and refurbishment decisions for PWRs hinge on managing well-characterised but consequential degradation mechanisms — RPV embrittlement, PWSCC, steam generator tube wall thinning, FAC and concrete ageing. A structured, uncertainty-explicit lifecycle passport approach turns scattered surveillance, ISI and ageing-management evidence into defensible decisions for outage scope, component replacement and LTO licensing across APR1000, EPR and SMR-class plants.',
+  forcingFunctionBullets: [
+    'Ageing-management discipline',
+    'Outage-scope optimisation',
+    'Defensible LTO licensing case',
   ],
 };
 
