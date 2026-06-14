@@ -8,6 +8,7 @@ export interface PlantTerminology {
   shortName: string;            // "Fusion" / "PWR"
   longName: string;             // "Fusion Power Plant" / "Pressurised Water Reactor"
   productName: string;          // "Fusion Lifecycle Passport" / "PWR Lifecycle Passport"
+  acronym: string;              // "FLP" / "PLP"
   productTagline: string;
   dashboardHeroTitle: string;
   dashboardHeroSubtitle: string;
@@ -18,6 +19,11 @@ export interface PlantTerminology {
   matrixTitle: string;
   decisionPoints: { title: string; status: string; timeline: string }[];
   systemImpacts: { level: 'critical' | 'warning' | 'nominal'; title: string; description: string }[];
+  // Delivery model
+  deliveryIntro: string;
+  forcingFunctionTitle: string;
+  forcingFunctionBody: string;
+  forcingFunctionBullets: string[];
 }
 
 const FUSION_TERMS: PlantTerminology = {
