@@ -97,6 +97,41 @@ const PWR_TERMS: PlantTerminology = {
   ],
 };
 
+const PROJECT_TERMS: PlantTerminology = {
+  shortName: 'Project',
+  longName: 'Nuclear Project Lifecycle',
+  productName: 'Nuclear Project Lifecycle Passport',
+  productTagline: 'Risk, resilience, delivery and governance lens on the nuclear project lifecycle',
+  dashboardHeroTitle: 'Nuclear Project Lifecycle Passport',
+  dashboardHeroSubtitle:
+    'Programme-level asset management framework for nuclear new build, operation and decommissioning. Assesses each lifecycle element from a risk, resilience, project delivery and governance perspective — independent of reactor technology — and supports investment, sovereign and regulatory decision-making aligned with ISO 55000 and ISO 31000 principles.',
+  componentNoun: 'lifecycle elements',
+  uncertaintyAxisShort: 'Outcome Unc.',
+  uncertaintyAxisLong: 'Outcome / Delivery Uncertainty',
+  matrixXAxisLabel: 'Lower Delivery Uncertainty → Higher Delivery Uncertainty',
+  matrixTitle: 'Nuclear Project Lifecycle Criticality Matrix',
+  decisionPoints: [
+    { title: 'Final Investment Decision', status: 'Active', timeline: 'Pre-FID Year -2' },
+    { title: 'Construction Licence Issuance', status: 'Pending', timeline: 'Year 0' },
+    { title: 'Long-Term Operation Sanction', status: 'Review', timeline: 'COD + 40 years' },
+  ],
+  systemImpacts: [
+    { level: 'critical', title: 'Programme Outturn', description: 'Capex and schedule outturn determine bankability and sovereign exposure' },
+    { level: 'warning', title: 'Supply-Chain & Workforce Resilience', description: 'Single-vendor and skills gaps drive most schedule tail risk' },
+    { level: 'nominal', title: 'Governance Posture', description: 'Living safety case and active regulator engagement protect LTO optionality' },
+  ],
+  acronym: 'NPLP',
+  deliveryIntro: 'Implementation framework for deploying the Nuclear Project Lifecycle Passport across sponsors, owner-operators and lenders',
+  forcingFunctionTitle: 'Why a Programme-Level Lifecycle Passport Matters',
+  forcingFunctionBody:
+    'Nuclear project value is destroyed and created at the programme level — through licensing slip, capex overrun, supply-chain failure, workforce gaps and governance erosion — far more than at the component level. A structured lifecycle passport that treats each programme element as an asset, with explicit risk hypotheses, resilience posture and governance controls, turns scattered programme risk registers into a defensible, comparable, decision-grade evidence base for sponsors, regulators and financiers.',
+  forcingFunctionBullets: [
+    'Risk-explicit programme thinking',
+    'Resilience as a first-class design parameter',
+    'Governance evidence aligned to investor and regulator expectations',
+  ],
+};
+
 interface PlantContextType {
   plantType: PlantType;
   setPlantType: (p: PlantType) => void;
