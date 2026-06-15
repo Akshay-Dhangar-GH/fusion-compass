@@ -1,4 +1,4 @@
-import { Bell, Search, Settings, HelpCircle, Atom, Zap } from 'lucide-react';
+import { Bell, Search, Settings, HelpCircle, Atom, Zap, Briefcase } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ExportTemplateButton } from '@/components/export/ExportTemplateButton';
 import { ExportMethodologyButton } from '@/components/export/ExportMethodologyButton';
