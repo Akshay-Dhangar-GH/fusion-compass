@@ -112,12 +112,13 @@ export const PlantProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const setPlantType = useCallback((p: PlantType) => setPlantTypeState(p), []);
 
   const value = useMemo<PlantContextType>(
-    () => ({
-      plantType,
-      setPlantType,
-      baseAssets: plantType === 'fusion' ? fusionAssets : pwrAssets,
-      terminology: plantType === 'fusion' ? FUSION_TERMS : PWR_TERMS,
-    }),
+    () => {
+      const baseAssets =
+        plantType === 'fusion' ? fusionAssets : plantType === 'pwr' ? pwrAssets : projectAssets;
+      const terminology =
+        plantType === 'fusion' ? FUSION_TERMS : plantType === 'pwr' ? PWR_TERMS : PROJECT_TERMS;
+      return { plantType, setPlantType, baseAssets, terminology };
+    },
     [plantType, setPlantType],
   );
 
