@@ -339,7 +339,7 @@ export function generatePWRTemplate(): void {
   XLSX.utils.book_append_sheet(wb, createMaintainabilitySheet(),     '5. Maintainability');
   XLSX.utils.book_append_sheet(wb, createCriticalityScoringSheet(),  '6. Criticality Scoring');
   XLSX.utils.book_append_sheet(wb, createDecisionPostureSheet(),     '7. Decision Posture');
-  XLSX.utils.book_append_sheet(wb, createLTOLearningSheet(),         '8. LTO / OPEX Learning');
+  XLSX.utils.book_append_sheet(wb, createLTOLearningSheet(),         '8. LTO & OPEX Learning');
   XLSX.utils.book_append_sheet(wb, createDashboardSheet(),           '9. Dashboard');
   XLSX.utils.book_append_sheet(wb, createDataValidationSheet(),      'REF - Data Validation');
   XLSX.writeFile(wb, 'PWR_Lifecycle_Passport_Template.xlsx');
