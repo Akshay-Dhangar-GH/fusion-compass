@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
 import { FusionAsset, fusionAssets } from '@/data/fusionAssets';
 import { pwrAssets } from '@/data/pwrAssets';
+import { projectAssets } from '@/data/projectAssets';
 
-export type PlantType = 'fusion' | 'pwr';
+export type PlantType = 'fusion' | 'pwr' | 'project';
 
 export interface PlantTerminology {
   shortName: string;            // "Fusion" / "PWR"
