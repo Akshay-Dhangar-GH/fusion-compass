@@ -1,4 +1,4 @@
-import { Bell, Search, Settings, HelpCircle, Atom, Zap } from 'lucide-react';
+import { Bell, Search, Settings, HelpCircle, Atom, Zap, Briefcase } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ExportTemplateButton } from '@/components/export/ExportTemplateButton';
 import { ExportMethodologyButton } from '@/components/export/ExportMethodologyButton';
@@ -53,6 +53,21 @@ export const Header = ({ title, subtitle }: HeaderProps) => {
           >
             <Zap className="w-3.5 h-3.5" />
             PWR
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={plantType === 'project'}
+            onClick={() => setPlantType('project')}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all',
+              plantType === 'project'
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground',
+            )}
+          >
+            <Briefcase className="w-3.5 h-3.5" />
+            Project
           </button>
         </div>
       </div>
