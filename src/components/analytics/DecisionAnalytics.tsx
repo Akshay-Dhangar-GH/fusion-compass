@@ -35,81 +35,33 @@ export const DecisionAnalytics = () => {
 
       {/* Analytics Approach */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="flp-card p-6">
-          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-            <Activity className="w-6 h-6 text-primary" />
-          </div>
-          <h3 className="font-semibold text-foreground mb-2">Physics-Informed Models</h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            Degradation models grounded in materials science and plasma physics, 
-            calibrated with experimental data where available.
-          </p>
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-center gap-2 text-foreground">
-              <CheckCircle className="w-4 h-4 text-status-nominal" />
-              Neutron damage accumulation
-            </li>
-            <li className="flex items-center gap-2 text-foreground">
-              <CheckCircle className="w-4 h-4 text-status-nominal" />
-              Thermal fatigue cycling
-            </li>
-            <li className="flex items-center gap-2 text-foreground">
-              <CheckCircle className="w-4 h-4 text-status-nominal" />
-              Erosion rate estimation
-            </li>
-          </ul>
-        </div>
-
-        <div className="flp-card p-6">
-          <div className="w-12 h-12 rounded-xl bg-teal/10 flex items-center justify-center mb-4">
-            <BarChart3 className="w-6 h-6 text-teal" />
-          </div>
-          <h3 className="font-semibold text-foreground mb-2">Probabilistic Methods</h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            Bayesian updating of uncertainty as operational data becomes available, 
-            explicit quantification of knowledge gaps.
-          </p>
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-center gap-2 text-foreground">
-              <CheckCircle className="w-4 h-4 text-status-nominal" />
-              Prior/posterior uncertainty tracking
-            </li>
-            <li className="flex items-center gap-2 text-foreground">
-              <CheckCircle className="w-4 h-4 text-status-nominal" />
-              Value of information analysis
-            </li>
-            <li className="flex items-center gap-2 text-foreground">
-              <CheckCircle className="w-4 h-4 text-status-nominal" />
-              Decision tree modelling
-            </li>
-          </ul>
-        </div>
-
-        <div className="flp-card p-6">
-          <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center mb-4">
-            <Lightbulb className="w-6 h-6 text-gold" />
-          </div>
-          <h3 className="font-semibold text-foreground mb-2">Explainable ML</h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            Simple, interpretable machine learning for pattern recognition in monitoring 
-            data, with clear uncertainty quantification.
-          </p>
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-center gap-2 text-foreground">
-              <CheckCircle className="w-4 h-4 text-status-nominal" />
-              Anomaly detection
-            </li>
-            <li className="flex items-center gap-2 text-foreground">
-              <CheckCircle className="w-4 h-4 text-status-nominal" />
-              Trend extrapolation
-            </li>
-            <li className="flex items-center gap-2 text-foreground">
-              <CheckCircle className="w-4 h-4 text-status-nominal" />
-              Confidence intervals
-            </li>
-          </ul>
-        </div>
+        {terminology.analyticsApproachCards.map((card, idx) => {
+          const iconColor = idx === 0 ? 'primary' : idx === 1 ? 'teal' : 'gold';
+          const Icon = idx === 0 ? Activity : idx === 1 ? BarChart3 : Lightbulb;
+          return (
+            <div key={idx} className="flp-card p-6">
+              <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center mb-4',
+                iconColor === 'primary' ? 'bg-primary/10' : iconColor === 'teal' ? 'bg-teal/10' : 'bg-gold/10'
+              )}>
+                <Icon className={cn('w-6 h-6',
+                  iconColor === 'primary' ? 'text-primary' : iconColor === 'teal' ? 'text-teal' : 'text-gold'
+                )} />
+              </div>
+              <h3 className="font-semibold text-foreground mb-2">{card.title}</h3>
+              <p className="text-sm text-muted-foreground mb-4">{card.description}</p>
+              <ul className="space-y-2 text-sm">
+                {card.bullets.map((b, i) => (
+                  <li key={i} className="flex items-center gap-2 text-foreground">
+                    <CheckCircle className="w-4 h-4 text-status-nominal" />
+                    {b}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
       </div>
+
 
       {/* {ACR} Decision Support */}
       <div className="flp-card p-6">
