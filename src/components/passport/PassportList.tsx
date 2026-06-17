@@ -1,14 +1,16 @@
 import { FusionAsset } from '@/data/fusionAssets';
 import { cn } from '@/lib/utils';
-import { ChevronRight, Filter } from 'lucide-react';
+import { ChevronRight, Filter, Wand2 } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { useScenario } from '@/contexts/ScenarioContext';
 import { usePlant } from '@/contexts/PlantContext';
+import { ProgrammeAssetWizard } from './ProgrammeAssetWizard';
 
 interface PassportListProps {
   onSelectAsset: (assetId: string) => void;
 }
+
 
 export const PassportList = ({ onSelectAsset }: PassportListProps) => {
   const { getActiveAssets } = useScenario();
