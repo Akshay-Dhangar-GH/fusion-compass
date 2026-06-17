@@ -5,27 +5,79 @@ import { projectAssets } from '@/data/projectAssets';
 
 export type PlantType = 'fusion' | 'pwr' | 'project';
 
+export interface PassportSectionLabels {
+  identityTitle: string;
+  hypothesesTitle: string;
+  hypothesesBadgeNoun: string;
+  monitoringTitle: string;
+  maintainabilityTitle: string;
+  systemValueTitle: string;
+  endOfLifeTitle: string;
+  rdJustificationTitle: string;
+  uncertaintyQuickStatLabel: string;
+  replaceabilityQuickStatLabel: string;
+  instrumentationPriorityLabel: string;
+}
+
+export interface AnalyticsApproachCard {
+  title: string;
+  description: string;
+  bullets: string[];
+}
+
 export interface PlantTerminology {
-  shortName: string;            // "Fusion" / "PWR"
-  longName: string;             // "Fusion Power Plant" / "Pressurised Water Reactor"
-  productName: string;          // "Fusion Lifecycle Passport" / "PWR Lifecycle Passport"
-  acronym: string;              // "FLP" / "PLP"
+  shortName: string;
+  longName: string;
+  productName: string;
+  acronym: string;
   productTagline: string;
   dashboardHeroTitle: string;
   dashboardHeroSubtitle: string;
-  componentNoun: string;        // "fusion components" / "PWR components"
-  uncertaintyAxisShort: string; // "Neutron Unc." / "Degradation Unc."
-  uncertaintyAxisLong: string;  // "Neutron Damage Uncertainty" / "Degradation Uncertainty"
+  componentNoun: string;
+  uncertaintyAxisShort: string;
+  uncertaintyAxisLong: string;
   matrixXAxisLabel: string;
   matrixTitle: string;
   decisionPoints: { title: string; status: string; timeline: string }[];
   systemImpacts: { level: 'critical' | 'warning' | 'nominal'; title: string; description: string }[];
-  // Delivery model
   deliveryIntro: string;
   forcingFunctionTitle: string;
   forcingFunctionBody: string;
   forcingFunctionBullets: string[];
+  passportSections: PassportSectionLabels;
+  analyticsApproachCards: [AnalyticsApproachCard, AnalyticsApproachCard, AnalyticsApproachCard];
+  costBenefitSubtitle: string;
+  strategyComparisonNoun: string;
 }
+
+const COMPONENT_PASSPORT_SECTIONS: PassportSectionLabels = {
+  identityTitle: 'Asset Identity & Design Intent',
+  hypothesesTitle: 'Degradation & Failure Hypotheses',
+  hypothesesBadgeNoun: 'mechanisms identified',
+  monitoringTitle: 'Monitoring & Observability Strategy',
+  maintainabilityTitle: 'Maintainability & Replaceability',
+  systemValueTitle: 'System Value Dependency',
+  endOfLifeTitle: 'End-of-Life & Decommissioning Assumptions',
+  rdJustificationTitle: 'R&D Investment Justification',
+  uncertaintyQuickStatLabel: 'Neutron Uncertainty',
+  replaceabilityQuickStatLabel: 'Replaceability',
+  instrumentationPriorityLabel: 'Instrumentation Priority',
+};
+
+const PROJECT_PASSPORT_SECTIONS: PassportSectionLabels = {
+  identityTitle: 'Programme Element Identity & Delivery Intent',
+  hypothesesTitle: 'Risk Hypotheses & Threats to Delivery',
+  hypothesesBadgeNoun: 'risks identified',
+  monitoringTitle: 'Governance, Assurance & Early-Warning Controls',
+  maintainabilityTitle: 'Resilience & Recovery Posture',
+  systemValueTitle: 'Strategic & Programme Value Dependency',
+  endOfLifeTitle: 'Programme Close-out, Handover & Records',
+  rdJustificationTitle: 'Investment & Intervention Justification',
+  uncertaintyQuickStatLabel: 'Outcome Uncertainty',
+  replaceabilityQuickStatLabel: 'Recoverability Difficulty',
+  instrumentationPriorityLabel: 'Assurance Priority',
+};
+
 
 const FUSION_TERMS: PlantTerminology = {
   shortName: 'Fusion',
