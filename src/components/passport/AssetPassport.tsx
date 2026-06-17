@@ -219,7 +219,7 @@ export const AssetPassport = ({ asset, onBack }: AssetPassportProps) => {
 
         {/* Maintainability & Replaceability */}
         <PassportSection 
-          title="Maintainability & Replaceability" 
+          title={L.maintainabilityTitle} 
           icon={<Wrench className="w-4 h-4" />}
         >
           <div className="grid grid-cols-2 gap-6">
