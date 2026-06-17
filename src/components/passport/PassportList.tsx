@@ -39,9 +39,18 @@ export const PassportList = ({ onSelectAsset }: PassportListProps) => {
           <p className="text-muted-foreground mt-1">
             Comprehensive lifecycle documentation for critical {terminology.componentNoun}
           </p>
-
         </div>
+        {plantType === 'project' && (
+          <Button onClick={() => setWizardOpen(true)} className="gap-2">
+            <Wand2 className="w-4 h-4" /> Add programme element
+          </Button>
+        )}
       </div>
+
+      {plantType === 'project' && (
+        <ProgrammeAssetWizard open={wizardOpen} onOpenChange={setWizardOpen} />
+      )}
+
 
       {/* Category Filter */}
       <div className="flex items-center gap-2 flex-wrap">
