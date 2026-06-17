@@ -318,7 +318,7 @@ export const AssetPassport = ({ asset, onBack }: AssetPassportProps) => {
 
         {/* End-of-Life & Decommissioning */}
         <PassportSection 
-          title="End-of-Life & Decommissioning Assumptions" 
+          title={L.endOfLifeTitle} 
           icon={<Trash2 className="w-4 h-4" />}
         >
           <div className="grid grid-cols-2 gap-6">
