@@ -14,9 +14,11 @@ interface PassportListProps {
 
 export const PassportList = ({ onSelectAsset }: PassportListProps) => {
   const { getActiveAssets } = useScenario();
-  const { terminology } = usePlant();
+  const { terminology, plantType } = usePlant();
   const assets = getActiveAssets();
   const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [wizardOpen, setWizardOpen] = useState(false);
+
 
   const categories = useMemo(
     () => ['All', ...Array.from(new Set(assets.map(a => a.category)))],
