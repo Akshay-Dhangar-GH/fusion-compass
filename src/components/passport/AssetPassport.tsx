@@ -183,7 +183,7 @@ export const AssetPassport = ({ asset, onBack }: AssetPassportProps) => {
 
         {/* Monitoring & Observability Strategy */}
         <PassportSection 
-          title="Monitoring & Observability Strategy" 
+          title={L.monitoringTitle} 
           icon={<Eye className="w-4 h-4" />}
         >
           <div className="space-y-4">
