@@ -38,7 +38,10 @@ const riskColors = {
 };
 
 export const AssetPassport = ({ asset, onBack }: AssetPassportProps) => {
+  const { terminology } = usePlant();
+  const L = terminology.passportSections;
   return (
+
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-start gap-6">
