@@ -168,7 +168,28 @@ const PWR_TERMS: PlantTerminology = {
     'Outage-scope optimisation',
     'Defensible LTO licensing case',
   ],
+  passportSections: COMPONENT_PASSPORT_SECTIONS,
+  analyticsApproachCards: [
+    {
+      title: 'Ageing-Management Models',
+      description: 'Degradation models for PWR-specific mechanisms (RPV embrittlement, PWSCC, FAC, SG tube thinning) calibrated against fleet operating experience and surveillance data.',
+      bullets: ['RPV neutron embrittlement (RTNDT shift)', 'PWSCC of Alloy 600/82/182', 'FAC and SG tube wall thinning'],
+    },
+    {
+      title: 'Probabilistic Methods',
+      description: 'Bayesian updating of degradation rates as ISI, surveillance and operating data accumulate, with explicit treatment of remaining uncertainty.',
+      bullets: ['Prior/posterior degradation tracking', 'Value of information for ISI scope', 'Probabilistic LTO case'],
+    },
+    {
+      title: 'Explainable Analytics',
+      description: 'Interpretable analytics for outage planning, with clear traceability from operating data to recommended scope.',
+      bullets: ['ISI indication trending', 'Outage scope optimisation', 'Confidence intervals on remaining life'],
+    },
+  ],
+  costBenefitSubtitle: 'Compare maintenance and refurbishment strategies and calculate ROI based on lifecycle costs',
+  strategyComparisonNoun: 'maintenance strategies',
 };
+
 
 const PROJECT_TERMS: PlantTerminology = {
   shortName: 'Project',
