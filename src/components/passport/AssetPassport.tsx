@@ -1,12 +1,13 @@
 import { FusionAsset } from '@/data/fusionAssets';
 import { PassportSection } from './PassportSection';
 import { cn } from '@/lib/utils';
-import { 
-  Fingerprint, 
-  Activity, 
-  Eye, 
-  Wrench, 
-  Zap, 
+import { usePlant } from '@/contexts/PlantContext';
+import {
+  Fingerprint,
+  Activity,
+  Eye,
+  Wrench,
+  Zap,
   Trash2,
   ArrowLeft,
   AlertTriangle,
@@ -15,6 +16,7 @@ import {
   XCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+
 
 interface AssetPassportProps {
   asset: FusionAsset;
@@ -36,7 +38,10 @@ const riskColors = {
 };
 
 export const AssetPassport = ({ asset, onBack }: AssetPassportProps) => {
+  const { terminology } = usePlant();
+  const L = terminology.passportSections;
   return (
+
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-start gap-6">
@@ -80,12 +85,13 @@ export const AssetPassport = ({ asset, onBack }: AssetPassportProps) => {
           <p className="font-semibold text-foreground">{asset.maturityLevel}</p>
         </div>
         <div className="flp-card p-4 text-center">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Neutron Uncertainty</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{L.uncertaintyQuickStatLabel}</p>
           <p className="font-semibold text-foreground">{asset.neutronDamageUncertainty}/5</p>
         </div>
         <div className="flp-card p-4 text-center">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Replaceability</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{L.replaceabilityQuickStatLabel}</p>
           <p className="font-semibold text-foreground">{asset.replaceabilityDifficulty}/5</p>
+
         </div>
         <div className="flp-card p-4 text-center">
           <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Learning Priority</p>
@@ -102,7 +108,7 @@ export const AssetPassport = ({ asset, onBack }: AssetPassportProps) => {
       <div className="space-y-4">
         {/* Asset Identity & Design Intent */}
         <PassportSection 
-          title="Asset Identity & Design Intent" 
+          title={L.identityTitle} 
           icon={<Fingerprint className="w-4 h-4" />}
         >
           <div className="space-y-4">
@@ -139,14 +145,15 @@ export const AssetPassport = ({ asset, onBack }: AssetPassportProps) => {
         </PassportSection>
 
         {/* Degradation & Failure Hypotheses */}
-        <PassportSection 
-          title="Degradation & Failure Hypotheses" 
+        <PassportSection
+          title={L.hypothesesTitle}
           icon={<Activity className="w-4 h-4" />}
           badge={
             <span className="text-xs text-muted-foreground">
-              {asset.degradationHypotheses.length} mechanisms identified
+              {asset.degradationHypotheses.length} {L.hypothesesBadgeNoun}
             </span>
           }
+
         >
           <div className="space-y-4">
             {asset.degradationHypotheses.map((hypothesis, i) => (
@@ -176,7 +183,7 @@ export const AssetPassport = ({ asset, onBack }: AssetPassportProps) => {
 
         {/* Monitoring & Observability Strategy */}
         <PassportSection 
-          title="Monitoring & Observability Strategy" 
+          title={L.monitoringTitle} 
           icon={<Eye className="w-4 h-4" />}
         >
           <div className="space-y-4">
@@ -212,7 +219,7 @@ export const AssetPassport = ({ asset, onBack }: AssetPassportProps) => {
 
         {/* Maintainability & Replaceability */}
         <PassportSection 
-          title="Maintainability & Replaceability" 
+          title={L.maintainabilityTitle} 
           icon={<Wrench className="w-4 h-4" />}
         >
           <div className="grid grid-cols-2 gap-6">
@@ -259,7 +266,7 @@ export const AssetPassport = ({ asset, onBack }: AssetPassportProps) => {
 
         {/* System Value Dependency */}
         <PassportSection 
-          title="System Value Dependency" 
+          title={L.systemValueTitle} 
           icon={<Zap className="w-4 h-4" />}
         >
           <div className="space-y-4">
@@ -311,7 +318,7 @@ export const AssetPassport = ({ asset, onBack }: AssetPassportProps) => {
 
         {/* End-of-Life & Decommissioning */}
         <PassportSection 
-          title="End-of-Life & Decommissioning Assumptions" 
+          title={L.endOfLifeTitle} 
           icon={<Trash2 className="w-4 h-4" />}
         >
           <div className="grid grid-cols-2 gap-6">
@@ -356,11 +363,12 @@ export const AssetPassport = ({ asset, onBack }: AssetPassportProps) => {
 
         {/* R&D Investment Justification */}
         <div className="flp-card p-6 border-l-4 border-l-teal">
-          <h3 className="font-semibold text-foreground mb-2">R&D Investment Justification</h3>
+          <h3 className="font-semibold text-foreground mb-2">{L.rdJustificationTitle}</h3>
           <p className="text-muted-foreground">{asset.rdInvestmentJustification}</p>
           <div className="mt-4 flex items-center gap-4">
             <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Instrumentation Priority</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{L.instrumentationPriorityLabel}</p>
+
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((level) => (
                   <div

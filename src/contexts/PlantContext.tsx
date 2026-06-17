@@ -5,27 +5,79 @@ import { projectAssets } from '@/data/projectAssets';
 
 export type PlantType = 'fusion' | 'pwr' | 'project';
 
+export interface PassportSectionLabels {
+  identityTitle: string;
+  hypothesesTitle: string;
+  hypothesesBadgeNoun: string;
+  monitoringTitle: string;
+  maintainabilityTitle: string;
+  systemValueTitle: string;
+  endOfLifeTitle: string;
+  rdJustificationTitle: string;
+  uncertaintyQuickStatLabel: string;
+  replaceabilityQuickStatLabel: string;
+  instrumentationPriorityLabel: string;
+}
+
+export interface AnalyticsApproachCard {
+  title: string;
+  description: string;
+  bullets: string[];
+}
+
 export interface PlantTerminology {
-  shortName: string;            // "Fusion" / "PWR"
-  longName: string;             // "Fusion Power Plant" / "Pressurised Water Reactor"
-  productName: string;          // "Fusion Lifecycle Passport" / "PWR Lifecycle Passport"
-  acronym: string;              // "FLP" / "PLP"
+  shortName: string;
+  longName: string;
+  productName: string;
+  acronym: string;
   productTagline: string;
   dashboardHeroTitle: string;
   dashboardHeroSubtitle: string;
-  componentNoun: string;        // "fusion components" / "PWR components"
-  uncertaintyAxisShort: string; // "Neutron Unc." / "Degradation Unc."
-  uncertaintyAxisLong: string;  // "Neutron Damage Uncertainty" / "Degradation Uncertainty"
+  componentNoun: string;
+  uncertaintyAxisShort: string;
+  uncertaintyAxisLong: string;
   matrixXAxisLabel: string;
   matrixTitle: string;
   decisionPoints: { title: string; status: string; timeline: string }[];
   systemImpacts: { level: 'critical' | 'warning' | 'nominal'; title: string; description: string }[];
-  // Delivery model
   deliveryIntro: string;
   forcingFunctionTitle: string;
   forcingFunctionBody: string;
   forcingFunctionBullets: string[];
+  passportSections: PassportSectionLabels;
+  analyticsApproachCards: [AnalyticsApproachCard, AnalyticsApproachCard, AnalyticsApproachCard];
+  costBenefitSubtitle: string;
+  strategyComparisonNoun: string;
 }
+
+const COMPONENT_PASSPORT_SECTIONS: PassportSectionLabels = {
+  identityTitle: 'Asset Identity & Design Intent',
+  hypothesesTitle: 'Degradation & Failure Hypotheses',
+  hypothesesBadgeNoun: 'mechanisms identified',
+  monitoringTitle: 'Monitoring & Observability Strategy',
+  maintainabilityTitle: 'Maintainability & Replaceability',
+  systemValueTitle: 'System Value Dependency',
+  endOfLifeTitle: 'End-of-Life & Decommissioning Assumptions',
+  rdJustificationTitle: 'R&D Investment Justification',
+  uncertaintyQuickStatLabel: 'Neutron Uncertainty',
+  replaceabilityQuickStatLabel: 'Replaceability',
+  instrumentationPriorityLabel: 'Instrumentation Priority',
+};
+
+const PROJECT_PASSPORT_SECTIONS: PassportSectionLabels = {
+  identityTitle: 'Programme Element Identity & Delivery Intent',
+  hypothesesTitle: 'Risk Hypotheses & Threats to Delivery',
+  hypothesesBadgeNoun: 'risks identified',
+  monitoringTitle: 'Governance, Assurance & Early-Warning Controls',
+  maintainabilityTitle: 'Resilience & Recovery Posture',
+  systemValueTitle: 'Strategic & Programme Value Dependency',
+  endOfLifeTitle: 'Programme Close-out, Handover & Records',
+  rdJustificationTitle: 'Investment & Intervention Justification',
+  uncertaintyQuickStatLabel: 'Outcome Uncertainty',
+  replaceabilityQuickStatLabel: 'Recoverability Difficulty',
+  instrumentationPriorityLabel: 'Assurance Priority',
+};
+
 
 const FUSION_TERMS: PlantTerminology = {
   shortName: 'Fusion',
@@ -60,7 +112,28 @@ const FUSION_TERMS: PlantTerminology = {
     'Value of information mindset',
     'Design-stage AM integration',
   ],
+  passportSections: COMPONENT_PASSPORT_SECTIONS,
+  analyticsApproachCards: [
+    {
+      title: 'Physics-Informed Models',
+      description: 'Degradation models grounded in materials science and plasma physics, calibrated with experimental data where available.',
+      bullets: ['Neutron damage accumulation', 'Thermal fatigue cycling', 'Erosion rate estimation'],
+    },
+    {
+      title: 'Probabilistic Methods',
+      description: 'Bayesian updating of uncertainty as operational data becomes available, with explicit quantification of knowledge gaps.',
+      bullets: ['Prior/posterior uncertainty tracking', 'Value of information analysis', 'Decision tree modelling'],
+    },
+    {
+      title: 'Explainable ML',
+      description: 'Simple, interpretable machine learning for pattern recognition in monitoring data, with clear uncertainty quantification.',
+      bullets: ['Anomaly detection', 'Trend extrapolation', 'Confidence intervals'],
+    },
+  ],
+  costBenefitSubtitle: 'Compare maintenance strategies and calculate ROI based on lifecycle costs',
+  strategyComparisonNoun: 'maintenance strategies',
 };
+
 
 const PWR_TERMS: PlantTerminology = {
   shortName: 'PWR',
@@ -95,7 +168,28 @@ const PWR_TERMS: PlantTerminology = {
     'Outage-scope optimisation',
     'Defensible LTO licensing case',
   ],
+  passportSections: COMPONENT_PASSPORT_SECTIONS,
+  analyticsApproachCards: [
+    {
+      title: 'Ageing-Management Models',
+      description: 'Degradation models for PWR-specific mechanisms (RPV embrittlement, PWSCC, FAC, SG tube thinning) calibrated against fleet operating experience and surveillance data.',
+      bullets: ['RPV neutron embrittlement (RTNDT shift)', 'PWSCC of Alloy 600/82/182', 'FAC and SG tube wall thinning'],
+    },
+    {
+      title: 'Probabilistic Methods',
+      description: 'Bayesian updating of degradation rates as ISI, surveillance and operating data accumulate, with explicit treatment of remaining uncertainty.',
+      bullets: ['Prior/posterior degradation tracking', 'Value of information for ISI scope', 'Probabilistic LTO case'],
+    },
+    {
+      title: 'Explainable Analytics',
+      description: 'Interpretable analytics for outage planning, with clear traceability from operating data to recommended scope.',
+      bullets: ['ISI indication trending', 'Outage scope optimisation', 'Confidence intervals on remaining life'],
+    },
+  ],
+  costBenefitSubtitle: 'Compare maintenance and refurbishment strategies and calculate ROI based on lifecycle costs',
+  strategyComparisonNoun: 'maintenance strategies',
 };
+
 
 const PROJECT_TERMS: PlantTerminology = {
   shortName: 'Project',
@@ -130,7 +224,28 @@ const PROJECT_TERMS: PlantTerminology = {
     'Resilience as a first-class design parameter',
     'Governance evidence aligned to investor and regulator expectations',
   ],
+  passportSections: PROJECT_PASSPORT_SECTIONS,
+  analyticsApproachCards: [
+    {
+      title: 'Structured Risk & Resilience',
+      description: 'Programme risks captured as explicit hypotheses with confidence, owner and early-warning controls — not buried in a flat risk register.',
+      bullets: ['Risk hypothesis framing', 'Resilience posture per element', 'Single-point-of-failure mapping'],
+    },
+    {
+      title: 'Decision-Grade Evidence',
+      description: 'Quantified uncertainty on capex, schedule and outturn supports FID, refinancing and regulator engagement under deep uncertainty.',
+      bullets: ['P50 / P90 outturn tracking', 'Value of assurance information', 'Scenario and option-value framing'],
+    },
+    {
+      title: 'Governance & Assurance',
+      description: 'Living governance posture per lifecycle element — ownership, controls, escalation routes — aligned to ISO 55000, ISO 31000 and investor expectations.',
+      bullets: ['Owner and accountability mapping', 'Three-lines-of-defence assurance', 'Regulator and lender engagement evidence'],
+    },
+  ],
+  costBenefitSubtitle: 'Compare programme-level intervention strategies and quantify lifecycle cost and resilience trade-offs',
+  strategyComparisonNoun: 'intervention strategies',
 };
+
 
 interface PlantContextType {
   plantType: PlantType;

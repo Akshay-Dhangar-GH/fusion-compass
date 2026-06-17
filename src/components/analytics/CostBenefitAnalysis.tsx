@@ -48,7 +48,11 @@ import { SensitivityAnalysis } from './SensitivityAnalysis';
 import { WhatIfBuilder } from './WhatIfBuilder';
 import { useStrategyAnalysis, maintenanceStrategies } from '@/hooks/useStrategyAnalysis';
 
+import { usePlant } from '@/contexts/PlantContext';
+
 export const CostBenefitAnalysis = () => {
+  const { terminology } = usePlant();
+
   const { 
     getActiveAssets, 
     getComparisonAssets, 
@@ -140,7 +144,7 @@ export const CostBenefitAnalysis = () => {
               Cost-Benefit Analysis
             </h2>
             <p className="text-muted-foreground mt-1">
-              Compare maintenance strategies and calculate ROI based on lifecycle costs
+              {terminology.costBenefitSubtitle}
             </p>
           </div>
           <Badge variant="outline" className="text-xs">
