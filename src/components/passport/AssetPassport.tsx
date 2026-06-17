@@ -85,12 +85,13 @@ export const AssetPassport = ({ asset, onBack }: AssetPassportProps) => {
           <p className="font-semibold text-foreground">{asset.maturityLevel}</p>
         </div>
         <div className="flp-card p-4 text-center">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Neutron Uncertainty</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{L.uncertaintyQuickStatLabel}</p>
           <p className="font-semibold text-foreground">{asset.neutronDamageUncertainty}/5</p>
         </div>
         <div className="flp-card p-4 text-center">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Replaceability</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{L.replaceabilityQuickStatLabel}</p>
           <p className="font-semibold text-foreground">{asset.replaceabilityDifficulty}/5</p>
+
         </div>
         <div className="flp-card p-4 text-center">
           <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Learning Priority</p>
