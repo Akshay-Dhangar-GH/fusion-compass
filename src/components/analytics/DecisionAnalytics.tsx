@@ -17,6 +17,7 @@ export const DecisionAnalytics = () => {
   const { terminology } = usePlant();
   const ACR = terminology.acronym;
   const assets = getActiveAssets();
+
   const prioritizedAssets = [...assets].sort((a, b) => {
     const scoreA = a.neutronDamageUncertainty + a.replaceabilityDifficulty + a.systemValueImpact;
     const scoreB = b.neutronDamageUncertainty + b.replaceabilityDifficulty + b.systemValueImpact;
