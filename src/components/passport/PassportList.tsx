@@ -1,20 +1,24 @@
 import { FusionAsset } from '@/data/fusionAssets';
 import { cn } from '@/lib/utils';
-import { ChevronRight, Filter } from 'lucide-react';
+import { ChevronRight, Filter, Wand2 } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { useScenario } from '@/contexts/ScenarioContext';
 import { usePlant } from '@/contexts/PlantContext';
+import { ProgrammeAssetWizard } from './ProgrammeAssetWizard';
 
 interface PassportListProps {
   onSelectAsset: (assetId: string) => void;
 }
 
+
 export const PassportList = ({ onSelectAsset }: PassportListProps) => {
   const { getActiveAssets } = useScenario();
-  const { terminology } = usePlant();
+  const { terminology, plantType } = usePlant();
   const assets = getActiveAssets();
   const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [wizardOpen, setWizardOpen] = useState(false);
+
 
   const categories = useMemo(
     () => ['All', ...Array.from(new Set(assets.map(a => a.category)))],
@@ -35,9 +39,18 @@ export const PassportList = ({ onSelectAsset }: PassportListProps) => {
           <p className="text-muted-foreground mt-1">
             Comprehensive lifecycle documentation for critical {terminology.componentNoun}
           </p>
-
         </div>
+        {plantType === 'project' && (
+          <Button onClick={() => setWizardOpen(true)} className="gap-2">
+            <Wand2 className="w-4 h-4" /> Add programme element
+          </Button>
+        )}
       </div>
+
+      {plantType === 'project' && (
+        <ProgrammeAssetWizard open={wizardOpen} onOpenChange={setWizardOpen} />
+      )}
+
 
       {/* Category Filter */}
       <div className="flex items-center gap-2 flex-wrap">

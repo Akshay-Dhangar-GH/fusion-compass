@@ -49,9 +49,14 @@ import { WhatIfBuilder } from './WhatIfBuilder';
 import { useStrategyAnalysis, maintenanceStrategies } from '@/hooks/useStrategyAnalysis';
 
 import { usePlant } from '@/contexts/PlantContext';
+import { ProgrammeCostBenefit } from './ProgrammeCostBenefit';
 
 export const CostBenefitAnalysis = () => {
-  const { terminology } = usePlant();
+  const { terminology, plantType } = usePlant();
+  if (plantType === 'project') {
+    return <ProgrammeCostBenefit />;
+  }
+
 
   const { 
     getActiveAssets, 

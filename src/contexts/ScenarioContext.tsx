@@ -31,8 +31,10 @@ interface ScenarioContextType {
   toggleCompareMode: () => void;
 
   modifyAsset: (scenarioId: string, assetId: string, modifications: Partial<FusionAsset>) => void;
+  addAsset: (scenarioId: string, asset: FusionAsset) => void;
   resetAsset: (scenarioId: string, assetId: string) => void;
   resetScenario: (scenarioId: string) => void;
+
 
   getActiveAssets: () => FusionAsset[];
   getComparisonAssets: () => FusionAsset[] | null;
@@ -147,6 +149,15 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }));
   }, []);
 
+  const addAsset = useCallback((scenarioId: string, asset: FusionAsset) => {
+    setScenarios(prev => prev.map(scenario => {
+      if (scenario.id !== scenarioId) return scenario;
+      return { ...scenario, assets: [...scenario.assets, asset] };
+    }));
+  }, []);
+
+
+
   const resetAsset = useCallback((scenarioId: string, assetId: string) => {
     const baseAsset = baseAssetsRef.current.find(a => a.id === assetId);
     if (!baseAsset) return;
@@ -214,6 +225,7 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setComparisonScenario,
     toggleCompareMode,
     modifyAsset,
+    addAsset,
     resetAsset,
     resetScenario,
     getActiveAssets,
@@ -223,9 +235,10 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }), [
     scenarios, activeScenarioId, comparisonScenarioId, isComparing,
     createScenario, duplicateScenario, deleteScenario, setActiveScenario,
-    setComparisonScenario, toggleCompareMode, modifyAsset, resetAsset, resetScenario,
+    setComparisonScenario, toggleCompareMode, modifyAsset, addAsset, resetAsset, resetScenario,
     getActiveAssets, getComparisonAssets, getScenario, getAssetDiff,
   ]);
+
 
   return <ScenarioContext.Provider value={value}>{children}</ScenarioContext.Provider>;
 };
