@@ -149,6 +149,15 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }));
   }, []);
 
+  const addAsset = useCallback((scenarioId: string, asset: FusionAsset) => {
+    setScenarios(prev => prev.map(scenario => {
+      if (scenario.id !== scenarioId) return scenario;
+      return { ...scenario, assets: [...scenario.assets, asset] };
+    }));
+  }, []);
+
+
+
   const resetAsset = useCallback((scenarioId: string, assetId: string) => {
     const baseAsset = baseAssetsRef.current.find(a => a.id === assetId);
     if (!baseAsset) return;
