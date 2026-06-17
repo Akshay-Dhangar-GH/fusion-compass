@@ -31,8 +31,10 @@ interface ScenarioContextType {
   toggleCompareMode: () => void;
 
   modifyAsset: (scenarioId: string, assetId: string, modifications: Partial<FusionAsset>) => void;
+  addAsset: (scenarioId: string, asset: FusionAsset) => void;
   resetAsset: (scenarioId: string, assetId: string) => void;
   resetScenario: (scenarioId: string) => void;
+
 
   getActiveAssets: () => FusionAsset[];
   getComparisonAssets: () => FusionAsset[] | null;
