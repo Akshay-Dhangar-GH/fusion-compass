@@ -108,7 +108,7 @@ export const AssetPassport = ({ asset, onBack }: AssetPassportProps) => {
       <div className="space-y-4">
         {/* Asset Identity & Design Intent */}
         <PassportSection 
-          title="Asset Identity & Design Intent" 
+          title={L.identityTitle} 
           icon={<Fingerprint className="w-4 h-4" />}
         >
           <div className="space-y-4">
