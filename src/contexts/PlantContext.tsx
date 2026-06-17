@@ -224,7 +224,28 @@ const PROJECT_TERMS: PlantTerminology = {
     'Resilience as a first-class design parameter',
     'Governance evidence aligned to investor and regulator expectations',
   ],
+  passportSections: PROJECT_PASSPORT_SECTIONS,
+  analyticsApproachCards: [
+    {
+      title: 'Structured Risk & Resilience',
+      description: 'Programme risks captured as explicit hypotheses with confidence, owner and early-warning controls — not buried in a flat risk register.',
+      bullets: ['Risk hypothesis framing', 'Resilience posture per element', 'Single-point-of-failure mapping'],
+    },
+    {
+      title: 'Decision-Grade Evidence',
+      description: 'Quantified uncertainty on capex, schedule and outturn supports FID, refinancing and regulator engagement under deep uncertainty.',
+      bullets: ['P50 / P90 outturn tracking', 'Value of assurance information', 'Scenario and option-value framing'],
+    },
+    {
+      title: 'Governance & Assurance',
+      description: 'Living governance posture per lifecycle element — ownership, controls, escalation routes — aligned to ISO 55000, ISO 31000 and investor expectations.',
+      bullets: ['Owner and accountability mapping', 'Three-lines-of-defence assurance', 'Regulator and lender engagement evidence'],
+    },
+  ],
+  costBenefitSubtitle: 'Compare programme-level intervention strategies and quantify lifecycle cost and resilience trade-offs',
+  strategyComparisonNoun: 'intervention strategies',
 };
+
 
 interface PlantContextType {
   plantType: PlantType;
