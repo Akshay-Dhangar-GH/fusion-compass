@@ -266,7 +266,7 @@ export const AssetPassport = ({ asset, onBack }: AssetPassportProps) => {
 
         {/* System Value Dependency */}
         <PassportSection 
-          title="System Value Dependency" 
+          title={L.systemValueTitle} 
           icon={<Zap className="w-4 h-4" />}
         >
           <div className="space-y-4">
