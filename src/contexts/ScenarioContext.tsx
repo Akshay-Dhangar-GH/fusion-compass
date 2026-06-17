@@ -225,6 +225,7 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setComparisonScenario,
     toggleCompareMode,
     modifyAsset,
+    addAsset,
     resetAsset,
     resetScenario,
     getActiveAssets,
@@ -234,9 +235,10 @@ export const ScenarioProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }), [
     scenarios, activeScenarioId, comparisonScenarioId, isComparing,
     createScenario, duplicateScenario, deleteScenario, setActiveScenario,
-    setComparisonScenario, toggleCompareMode, modifyAsset, resetAsset, resetScenario,
+    setComparisonScenario, toggleCompareMode, modifyAsset, addAsset, resetAsset, resetScenario,
     getActiveAssets, getComparisonAssets, getScenario, getAssetDiff,
   ]);
+
 
   return <ScenarioContext.Provider value={value}>{children}</ScenarioContext.Provider>;
 };
