@@ -363,11 +363,12 @@ export const AssetPassport = ({ asset, onBack }: AssetPassportProps) => {
 
         {/* R&D Investment Justification */}
         <div className="flp-card p-6 border-l-4 border-l-teal">
-          <h3 className="font-semibold text-foreground mb-2">R&D Investment Justification</h3>
+          <h3 className="font-semibold text-foreground mb-2">{L.rdJustificationTitle}</h3>
           <p className="text-muted-foreground">{asset.rdInvestmentJustification}</p>
           <div className="mt-4 flex items-center gap-4">
             <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Instrumentation Priority</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{L.instrumentationPriorityLabel}</p>
+
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((level) => (
                   <div
