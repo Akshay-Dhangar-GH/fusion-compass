@@ -1,12 +1,13 @@
 import { FusionAsset } from '@/data/fusionAssets';
 import { PassportSection } from './PassportSection';
 import { cn } from '@/lib/utils';
-import { 
-  Fingerprint, 
-  Activity, 
-  Eye, 
-  Wrench, 
-  Zap, 
+import { usePlant } from '@/contexts/PlantContext';
+import {
+  Fingerprint,
+  Activity,
+  Eye,
+  Wrench,
+  Zap,
   Trash2,
   ArrowLeft,
   AlertTriangle,
@@ -15,6 +16,7 @@ import {
   XCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+
 
 interface AssetPassportProps {
   asset: FusionAsset;
