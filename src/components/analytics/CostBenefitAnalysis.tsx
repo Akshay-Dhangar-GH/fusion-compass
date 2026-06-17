@@ -48,7 +48,11 @@ import { SensitivityAnalysis } from './SensitivityAnalysis';
 import { WhatIfBuilder } from './WhatIfBuilder';
 import { useStrategyAnalysis, maintenanceStrategies } from '@/hooks/useStrategyAnalysis';
 
+import { usePlant } from '@/contexts/PlantContext';
+
 export const CostBenefitAnalysis = () => {
+  const { terminology } = usePlant();
+
   const { 
     getActiveAssets, 
     getComparisonAssets, 
