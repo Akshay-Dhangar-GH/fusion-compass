@@ -145,14 +145,15 @@ export const AssetPassport = ({ asset, onBack }: AssetPassportProps) => {
         </PassportSection>
 
         {/* Degradation & Failure Hypotheses */}
-        <PassportSection 
-          title="Degradation & Failure Hypotheses" 
+        <PassportSection
+          title={L.hypothesesTitle}
           icon={<Activity className="w-4 h-4" />}
           badge={
             <span className="text-xs text-muted-foreground">
-              {asset.degradationHypotheses.length} mechanisms identified
+              {asset.degradationHypotheses.length} {L.hypothesesBadgeNoun}
             </span>
           }
+
         >
           <div className="space-y-4">
             {asset.degradationHypotheses.map((hypothesis, i) => (
