@@ -144,7 +144,7 @@ export const CostBenefitAnalysis = () => {
               Cost-Benefit Analysis
             </h2>
             <p className="text-muted-foreground mt-1">
-              Compare maintenance strategies and calculate ROI based on lifecycle costs
+              {terminology.costBenefitSubtitle}
             </p>
           </div>
           <Badge variant="outline" className="text-xs">
