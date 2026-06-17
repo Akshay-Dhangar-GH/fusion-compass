@@ -112,7 +112,28 @@ const FUSION_TERMS: PlantTerminology = {
     'Value of information mindset',
     'Design-stage AM integration',
   ],
+  passportSections: COMPONENT_PASSPORT_SECTIONS,
+  analyticsApproachCards: [
+    {
+      title: 'Physics-Informed Models',
+      description: 'Degradation models grounded in materials science and plasma physics, calibrated with experimental data where available.',
+      bullets: ['Neutron damage accumulation', 'Thermal fatigue cycling', 'Erosion rate estimation'],
+    },
+    {
+      title: 'Probabilistic Methods',
+      description: 'Bayesian updating of uncertainty as operational data becomes available, with explicit quantification of knowledge gaps.',
+      bullets: ['Prior/posterior uncertainty tracking', 'Value of information analysis', 'Decision tree modelling'],
+    },
+    {
+      title: 'Explainable ML',
+      description: 'Simple, interpretable machine learning for pattern recognition in monitoring data, with clear uncertainty quantification.',
+      bullets: ['Anomaly detection', 'Trend extrapolation', 'Confidence intervals'],
+    },
+  ],
+  costBenefitSubtitle: 'Compare maintenance strategies and calculate ROI based on lifecycle costs',
+  strategyComparisonNoun: 'maintenance strategies',
 };
+
 
 const PWR_TERMS: PlantTerminology = {
   shortName: 'PWR',
